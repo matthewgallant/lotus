@@ -1,0 +1,48 @@
+{% extends 'include/base.html' %}
+
+{% block title %}Search{% endblock %}
+
+{% block main %}
+    <h1>Search</h1>
+    <form action="/results" method="post">
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="w" id="whiteColor" name="color">
+                <label class="form-check-label" for="whiteColor">
+                    White
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="u" id="blueColor" name="color">
+                <label class="form-check-label" for="blueColor">
+                    Blue
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="b" id="blackColor" name="color">
+                <label class="form-check-label" for="blackColor">
+                    Black
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="r" id="redColor" name="color">
+                <label class="form-check-label" for="redColor">
+                    Red
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="g" id="greenColor" name="color">
+                <label class="form-check-label" for="greenColor">
+                    Green
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="un" id="uncoloredColor" name="color">
+                <label class="form-check-label" for="uncoloredColor">
+                    Uncolored
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+{% endblock %}
