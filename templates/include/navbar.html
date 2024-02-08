@@ -12,7 +12,20 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/search">Search</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/decks">Decks</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/add-cards">Add Cards</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/import">Import</a>
+                </li>
             </ul>
+            <form class="d-flex" role="search" action="/results" method="post">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="name" autocomplete="off">
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
         </div>
     </div>
 </nav>

@@ -6,6 +6,24 @@
     <h1>Search</h1>
     <form action="/results" method="post">
         <div class="mb-3">
+            <label for="nameInput" class="form-label">Name</label>
+            <input class="form-control" placeholder="Name" name="name" id="nameInput" autocomplete="off">
+        </div>
+        <div class="mb-3">
+            <label for="typeDatalist" class="form-label">Type</label>
+            <input class="form-control" list="typeDatalistOptions" id="typeDatalist" name="type" placeholder="Type to search...">
+            <datalist id="typeDatalistOptions">
+                <option value="Creature">
+                <option value="Instant">
+                <option value="Sorcery">
+                <option value="Artifact">
+                <option value="Enchantment">
+                <option value="Planeswalker">
+                <option value="Land">
+                <option value="Battle">
+            </datalist>
+        </div>
+        <div class="mb-3">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="w" id="whiteColor" name="color">
                 <label class="form-check-label" for="whiteColor">

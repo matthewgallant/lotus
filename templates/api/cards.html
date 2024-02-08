@@ -1,8 +1,8 @@
 {% if cards.items|length > 0 %}
     {% for card in cards %}
         <div class="col-3 js-card">
-            <a href="https://scryfall.com/card/{{ card.scryfall_id }}" target="_blank" rel="noreferrer noopener">
-                <img src="https://api.scryfall.com/cards/{{ card.scryfall_id }}?format=image" class="card-img-top" alt="{{ card.name }}" loading="lazy">
+            <a href="/card/{{ card.id }}" target="_blank" rel="noreferrer noopener">
+                <img src="https://api.scryfall.com/cards/{{ card.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ card.name }}" loading="lazy">
             </a>
         </div>
     {% endfor %}

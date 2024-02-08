@@ -1,0 +1,65 @@
+{% extends 'include/base.html' %}
+
+{% block title %}{{ card.name }}{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-3">
+            <img src="https://api.scryfall.com/cards/{{ cards[0].scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ card.name }}" id="cardImage">
+        </div>
+        <div class="col-9">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Set ID</th>
+                        <th scope="col">Owned</th>
+                        <th scope="col">Rarity</th>
+                        <th scope="col">Foil</th>
+                        <th scope="col">Variation</th>
+                        <th scope="col">Collector Number</th>
+                        <th scope="col">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for card in cards %}
+                        <tr data-scryfall-id="{{ card.scryfall_id }}">
+                            <td>{{ card.set_id }}</td>
+                            <td>{{ card.quantity }}</td>
+                            <td class="text-capitalize">{{ card.rarity|default('N/A', 'true') }}</td>
+                            <td class="text-capitalize js-foil">{{ card.foil|default('regular', 'true') }}</td>
+                            <td class="text-capitalize">{{ card.variation|default('standard', 'true') }}</td>
+                            <td>{{ card.collector_number|default('N/A', 'true') }}</td>
+                            <td class="js-price">Loading...</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Change Image to Hovered Row -->
+    <script defer>
+        const cardImageEl = document.querySelector('#cardImage');
+        const rows = document.querySelectorAll('[data-scryfall-id]');
+        rows.forEach(row => {
+            row.addEventListener('mouseover', () => {
+                cardImageEl.src = `https://api.scryfall.com/cards/${row.dataset.scryfallId}?format=image`;
+            });
+        });
+    </script>
+    <!-- Live Price Loading -->
+    <script defer>
+        rows.forEach(row => {
+            fetch(`https://api.scryfall.com/cards/${row.dataset.scryfallId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const priceEl = row.querySelector('.js-price');
+                    const foilEl = row.querySelector('.js-foil');
+                    if (foilEl.innerText == 'Regular') {
+                        priceEl.innerText = `$${data['prices']['usd']}`;
+                    } else {
+                        priceEl.innerText = `$${data['prices']['usd_foil']}`;
+                    }
+                });
+        });
+    </script>
+{% endblock %}
