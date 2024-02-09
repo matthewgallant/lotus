@@ -1,0 +1,129 @@
+{% extends 'include/base.html' %}
+
+{% block title %}{{ deck.name }}{% endblock %}
+
+{% block main %}
+    <h1>{{ deck.name }} <span class="badge bg-secondary js-priceBadge">$0</span></h1>
+    {% if request.args.message %}
+        <div class="alert alert-success mt-4" role="alert">{{ request.args.message }}</div>
+    {% endif %}
+    <form action="{{ url_for('deck', id=deck.id) }}" method="post">
+        <div class="row my-4">
+            <div class="col">
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="plains" name="plains" placeholder="Plains" value="{{ deck.plains }}">
+                    <label for="plains">Plains</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="island" name="island" placeholder="Island" value="{{ deck.island }}">
+                    <label for="island">Island</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="swamp" name="swamp" placeholder="Swamp" value="{{ deck.swamp }}">
+                    <label for="swamp">Swamp</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="mountain" name="mountain" placeholder="Mountain" value="{{ deck.mountain }}">
+                    <label for="mountain">Mountain</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="forest" name="forest" placeholder="Forest" value="{{ deck.forest }}">
+                    <label for="forest">Forest</label>
+                </div>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary w-100 h-100">Save</button>
+            </div>
+        </div>
+    </form>
+    {% if deck.cards|length > 0 %}
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Set ID</th>
+                    <th scope="col">Rarity</th>
+                    <th scope="col">Foil</th>
+                    <th scope="col">Variation</th>
+                    <th scope="col">Color</th>
+                    <th scope="col">Price</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assoc in deck.cards %}
+                    <tr data-scryfall-id="{{ assoc.card.scryfall_id }}">
+                        <td>
+                            <a href="{{ url_for('card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.name }}</a>
+                            {% if assoc.is_commander %}
+                                <span class="badge bg-primary ms-1">Commander</span>
+                            {% endif %} 
+                        </td>
+                        <td>{{ assoc.card.set_id }}</td>
+                        <td class="text-capitalize">{{ assoc.card.rarity|default('N/A', 'true') }}</td>
+                        <td class="text-capitalize js-foil">{{ assoc.card.foil|default('regular', 'true') }}</td>
+                        <td class="text-capitalize">{{ assoc.card.variation|default('standard', 'true') }}</td>
+                        <td>Color</td>
+                        <td class="js-price">Loading...</td>
+                        <td class="text-center">
+                            {% if assoc.is_commander %}
+                                <a href="{{ url_for('unset_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" data-bs-toggle="tooltip" data-bs-title="Unset Commander">
+                                    <i class="bi-person"></i>
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('set_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" data-bs-toggle="tooltip" data-bs-title="Set Commander">
+                                    <i class="bi-person-fill"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ url_for('remove_card_from_deck', deck_id=deck.id, card_id=assoc.card.id, assoc_id=assoc.id) }}" data-bs-toggle="tooltip" data-bs-title="Remove From Deck">
+                                <i class="bi-trash-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No cards found for deck. <a href="/search">Find Some</a></p>
+    {% endif %}
+    <!-- Live Price Loading -->
+    <script defer>
+        let totalPrice = 0;
+        const priceBadgeEl = document.querySelector('.js-priceBadge');
+        const rows = document.querySelectorAll('[data-scryfall-id]');
+        rows.forEach(row => {
+            fetch(`https://api.scryfall.com/cards/${row.dataset.scryfallId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const priceEl = row.querySelector('.js-price');
+                    const foilEl = row.querySelector('.js-foil');
+                    if (foilEl.innerText == 'Regular') {
+                        totalPrice += parseFloat(data['prices']['usd']);
+                        priceEl.innerText = `$${data['prices']['usd']}`;
+                    } else {
+                        totalPrice += parseFloat(data['prices']['usd_foil']);
+                        priceEl.innerText = `$${data['prices']['usd_foil']}`;
+                    }
+                    priceBadgeEl.innerText = `$${Math.round((totalPrice + Number.EPSILON) * 100) / 100}`;
+                });
+        });
+    </script>
+    <!-- Enable Tooltips -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        });
+    </script>
+{% endblock %}

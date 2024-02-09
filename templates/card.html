@@ -3,6 +3,9 @@
 {% block title %}{{ card.name }}{% endblock %}
 
 {% block main %}
+    {% if request.args.message %}
+        <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
+    {% endif %}
     <div class="row">
         <div class="col-3">
             <img src="https://api.scryfall.com/cards/{{ cards[0].scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ card.name }}" id="cardImage">
@@ -13,23 +16,40 @@
                     <tr>
                         <th scope="col">Set ID</th>
                         <th scope="col">Owned</th>
+                        <th scope="col">In Decks</th>
                         <th scope="col">Rarity</th>
                         <th scope="col">Foil</th>
                         <th scope="col">Variation</th>
                         <th scope="col">Collector Number</th>
                         <th scope="col">Price</th>
+                        <th scope="col">Add to Deck</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="align-middle">
                     {% for card in cards %}
-                        <tr data-scryfall-id="{{ card.scryfall_id }}">
+                        <tr class="{{ 'table-danger' if card.decks|length >= card.quantity else 'table-success' }}" data-scryfall-id="{{ card.scryfall_id }}">
                             <td>{{ card.set_id }}</td>
                             <td>{{ card.quantity }}</td>
+                            <td>{{ card.decks|length }}</td>
                             <td class="text-capitalize">{{ card.rarity|default('N/A', 'true') }}</td>
                             <td class="text-capitalize js-foil">{{ card.foil|default('regular', 'true') }}</td>
                             <td class="text-capitalize">{{ card.variation|default('standard', 'true') }}</td>
                             <td>{{ card.collector_number|default('N/A', 'true') }}</td>
                             <td class="js-price">Loading...</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Deck
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {% for deck in decks %}
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('add_card_to_deck', deck_id=deck.id, card_id=card.id) }}">{{ deck.name }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

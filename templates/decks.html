@@ -1,0 +1,30 @@
+{% extends 'include/base.html' %}
+
+{% block title %}Decks{% endblock %}
+
+{% block main %}
+    <div class="d-flex justify-content-between align-items-center gap-2">
+        <h1>Decks</h1>
+        <a href="/decks/add" class="btn btn-primary">Add Deck</a>
+    </div>
+    {% if decks|length > 0 %}
+        <table class="table table-striped table-bordered table-hover mt-3">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Cards</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for deck in decks %}
+                    <tr>
+                        <td><a href="{{ url_for('deck', id=deck.id) }}">{{ deck.name }}</a></td>
+                        <td>{{ deck.cards|length + deck.plains|default(0, true) + deck.island|default(0, true) + deck.swamp|default(0, true) + deck.mountain|default(0, true) + deck.forest|default(0, true) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No decks found. <a href="/decks/add">Add Your First One</a></p>
+    {% endif %}
+{% endblock %}

@@ -1,30 +1,58 @@
 import os
 import urllib.parse
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase
 
 class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
 
-class Cards(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column()
-    set_id: Mapped[str] = mapped_column()
-    quantity: Mapped[int] = mapped_column()
-    foil: Mapped[str] = mapped_column()
-    variation: Mapped[str] = mapped_column()
-    collector_number: Mapped[int] = mapped_column()
-    scryfall_id: Mapped[str] = mapped_column()
-    color_identity: Mapped[str] = mapped_column()
-    type_line: Mapped[str] = mapped_column()
-    cmc: Mapped[int] = mapped_column()
-    power: Mapped[int] = mapped_column()
-    toughness: Mapped[int] = mapped_column()
-    rarity: Mapped[str] = mapped_column()
+class DeckCard(db.Model):
+    __tablename__ = "decks_cards"
+
+    id = db.Column(db.Integer, primary_key=True)
+    deck_id = db.Column(db.Integer, db.ForeignKey('decks.id'))
+    card_id = db.Column(db.Integer, db.ForeignKey('cards.id'))
+    is_commander = db.Column(db.Boolean)
+
+    deck = db.relationship('Deck', back_populates='cards')
+    card = db.relationship('Card', back_populates='decks')
+
+class Deck(db.Model):
+    __tablename__ = "decks"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    plains = db.Column(db.Integer)
+    island = db.Column(db.Integer)
+    swamp = db.Column(db.Integer)
+    mountain = db.Column(db.Integer)
+    forest = db.Column(db.Integer)
+
+    cards = db.relationship('DeckCard', back_populates='deck', order_by='DeckCard.is_commander.desc()')
+
+class Card(db.Model):
+    __tablename__ = "cards"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    set_id = db.Column(db.String)
+    quantity = db.Column(db.Integer)
+    foil = db.Column(db.String)
+    variation = db.Column(db.String)
+    collector_number = db.Column(db.Integer)
+    scryfall_id = db.Column(db.String)
+    color_identity = db.Column(db.String)
+    type_line = db.Column(db.String)
+    cmc = db.Column(db.Integer)
+    power = db.Column(db.Integer)
+    toughness = db.Column(db.Integer)
+    rarity = db.Column(db.String)
+
+    decks = db.relationship('DeckCard', back_populates='card')
 
 # Create the app
 app = Flask(__name__)
@@ -36,32 +64,30 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 db.init_app(app)
 
 def handle_search():
-    query = db.select(Cards).group_by(Cards.name)
+    query = db.select(Card).group_by(Card.name)
 
     # Handle color searches
     if request.args.get('name'):
-        query = query.where(Cards.name.like(f'%{request.args.get("name")}%'))
+        query = query.where(Card.name.like(f'%{request.args.get("name")}%'))
     if request.args.get('color'):
         colors = request.args.get('color').split(',')
         core_colors = ['w', 'u', 'b', 'r', 'g']
         if 'un' in colors:
-            query = query.where(Cards.color_identity == None, Cards.type_line.notlike('land'))
+            query = query.where(Card.color_identity == None, Card.type_line.notlike('land'))
         else:
             for color in core_colors:
                 if color in colors:
-                    query = query.where(Cards.color_identity.contains(color))
+                    query = query.where(Card.color_identity.contains(color))
                 else:
-                    query = query.where(Cards.color_identity.notlike(f'%{color}%'))
+                    query = query.where(Card.color_identity.notlike(f'%{color}%'))
     if request.args.get('type'):
-        query = query.where(Cards.type_line.like(f'%{request.args.get("type")}%'))
-    
-    print(query)
+        query = query.where(Card.type_line.like(f'%{request.args.get("type")}%'))
     
     return db.paginate(query, per_page=12)
 
 @app.route("/")
 def home():
-    collection_total = db.session.query(Cards).count()
+    collection_total = db.session.query(Card).count()
     return render_template("home.html", collection_total=collection_total)
 
 @app.route("/search")
@@ -87,7 +113,7 @@ def results():
 
         # Redirect to card page if only 1 card is found
         if cards.total == 1:
-            return redirect(f'/card/{cards.items[0].id}')
+            return redirect(url_for('card', id=cards.items[0].id))
         else:
             return render_template("results.html", cards=cards)
 
@@ -98,9 +124,73 @@ def api_cards():
 
 @app.route("/card/<id>")
 def card(id):
-    card = db.get_or_404(Cards, id)
-    cards = db.session.execute(db.select(Cards).where(Cards.name == card.name)).scalars().all()
-    return render_template("card.html", card=card, cards=cards)
+    card = db.get_or_404(Card, id)
+    cards = db.session.execute(db.select(Card).where(Card.name == card.name)).scalars().all()
+    decks = db.session.execute(db.select(Deck)).scalars().all()
+    return render_template("card.html", card=card, cards=cards, decks=decks)
+
+@app.route("/decks")
+def decks():
+    decks = db.session.execute(db.select(Deck)).scalars().all()
+    return render_template("decks.html", decks=decks)
+
+@app.route("/decks/add", methods=['GET', 'POST'])
+def add_deck():
+    if request.method == 'GET':
+        return render_template("add-deck.html")
+    else:
+        if request.form.get('name'):
+            deck = Deck(name=request.form.get('name'))
+            db.session.add(deck)
+            db.session.commit()
+            return redirect(url_for('deck', id=deck.id))
+        else:
+            return render_template("add-deck.html", error='A deck name is required!')
+        
+@app.route('/deck/<id>', methods=['GET', 'POST'])
+def deck(id):
+    deck = db.get_or_404(Deck, id)
+    if request.method == 'GET':
+        return render_template("deck.html", deck=deck)
+    else:
+        deck.plains = request.form.get('plains')
+        deck.island = request.form.get('island')
+        deck.swamp = request.form.get('swamp')
+        deck.mountain = request.form.get('mountain')
+        deck.forest = request.form.get('forest')
+        db.session.commit()
+        return render_template("deck.html", deck=deck)
+
+@app.route('/deck/<deck_id>/card/<card_id>/add')
+def add_card_to_deck(deck_id, card_id):
+    deck = db.get_or_404(Deck, deck_id)
+    card = db.get_or_404(Card, card_id)
+    deck_card = DeckCard()
+    deck_card.card = card
+    deck.cards.append(deck_card)
+    db.session.commit()
+    return redirect(url_for('card', id=card_id, message=f'{card.name} has been added to deck {deck.name}'))
+
+@app.route('/deck/<deck_id>/card/<card_id>/assoc/<assoc_id>/remove')
+def remove_card_from_deck(deck_id, card_id, assoc_id):
+    card = db.get_or_404(Card, card_id)
+    db.session.execute(db.delete(DeckCard).where(DeckCard.id == assoc_id))
+    db.session.commit()
+    return redirect(url_for('deck', id=deck_id, message=f'{card.name} has been removed from this deck'))
+
+@app.route('/deck/<deck_id>/assoc/<assoc_id>/commander/set')
+def set_commander_for_deck(deck_id, assoc_id):
+    assoc = db.session.execute(db.select(DeckCard).where(DeckCard.id == assoc_id)).scalar()
+    assoc.is_commander = True
+    db.session.commit()
+    return redirect(url_for('deck', id=deck_id))
+
+@app.route('/deck/<deck_id>/assoc/<assoc_id>/commander/unset')
+def unset_commander_for_deck(deck_id, assoc_id):
+    assoc = db.session.execute(db.select(DeckCard).where(DeckCard.id == assoc_id)).scalar()
+    assoc.is_commander = False
+    db.session.commit()
+    return redirect(url_for('deck', id=deck_id))
 
 @app.errorhandler(404) 
 def not_found(error):
