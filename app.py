@@ -391,6 +391,18 @@ def unset_commander_for_deck(deck_id, assoc_id):
     db.session.commit()
     return redirect(url_for('deck', id=deck_id))
 
+@app.route('/deck/<deck_id>/delete')
+def delete_deck(deck_id):
+    # Delete card associations
+    db.session.execute(db.delete(DeckCard).where(DeckCard.deck_id == deck_id))
+
+    # Delete deck
+    deck = db.get_or_404(Deck, deck_id)
+    db.session.delete(deck)
+
+    db.session.commit()
+    return redirect(url_for('decks', message=f"{deck.name} has been deleted"))
+
 @app.errorhandler(404) 
 def not_found(error):
     return render_template("404.html")

@@ -18,7 +18,7 @@
                     <tr>
                         <th scope="col">Set ID</th>
                         <th scope="col">Owned</th>
-                        <th scope="col">In Decks</th>
+                        <th scope="col">Available</th>
                         <th scope="col">Rarity</th>
                         <th scope="col">Foil</th>
                         <th scope="col">Variation</th>
@@ -32,7 +32,7 @@
                         <tr class="{{ 'table-danger' if card.decks|length >= card.quantity else 'table-success' }}" data-scryfall-id="{{ card.scryfall_id }}">
                             <td>{{ card.set_id }}</td>
                             <td>{{ card.quantity }}</td>
-                            <td>{{ card.decks|length }}</td>
+                            <td>{{ card.quantity - card.decks|length }}</td>
                             <td class="text-capitalize">{{ card.rarity|default('N/A', 'true') }}</td>
                             <td class="text-capitalize js-foil">{{ card.foil|default('regular', 'true') }}</td>
                             <td class="text-capitalize">{{ card.variation|default('standard', 'true') }}</td>
