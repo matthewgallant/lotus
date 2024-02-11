@@ -23,9 +23,17 @@
                 </li>
             </ul>
             <form class="d-flex" role="search" action="/results" method="post">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="name" autocomplete="off">
+                <input class="form-control me-2" id="searchInput" type="search" placeholder="Search: &#8984; + /" aria-label="Search" name="name" autocomplete="off">
                 <button class="btn btn-outline-light" type="submit">Search</button>
             </form>
         </div>
     </div>
 </nav>
+<script defer>
+    const searchInput = document.querySelector('#searchInput');
+    document.addEventListener('keydown', (e) => {
+        if (e.metaKey && e.keyCode === 191) {
+            searchInput.focus();
+        }
+    });
+</script>
