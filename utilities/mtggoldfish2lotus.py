@@ -31,7 +31,6 @@ for row in reader:
     set_id = row[1]
     quantity = int(row[3])
     foil = row[4]
-    variation = row[5]
     collector_number = row[6]
     scryfall_id = row[7]
 
@@ -44,8 +43,6 @@ for row in reader:
         quantity = None
     if foil == '':
         foil = None
-    if variation == '':
-        variation = None
     if collector_number == '':
         collector_number = None
     if scryfall_id == '':
@@ -116,7 +113,6 @@ for row in reader:
                 set_id,
                 quantity,
                 foil,
-                variation,
                 collector_number,
                 scryfall_id,
                 color_identity,
@@ -127,7 +123,7 @@ for row in reader:
                 rarity
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (name, set_id, quantity, foil, variation, collector_number, scryfall_id, color_identity, type_line, cmc, power, toughness, rarity)
+            (name, set_id, quantity, foil, collector_number, scryfall_id, color_identity, type_line, cmc, power, toughness, rarity)
         )
     else:
         print(f"No Scryfall ID found for {name}")

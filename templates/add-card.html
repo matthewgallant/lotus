@@ -9,9 +9,6 @@
     {% elif request.args.message %}
         <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
     {% endif %}
-    {% if error %}
-        <div class="alert alert-danger" role="alert">{{ error }}</div>
-    {% endif %}
     <form id="nameSearchForm">
         <div class="mt-3 d-flex align-items-center gap-3">
             <div class="w-100">

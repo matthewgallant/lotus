@@ -1,0 +1,38 @@
+{% extends 'include/base.html' %}
+
+{% block title %}Import Cards{% endblock %}
+
+{% block main %}
+    <h1>Import Cards</h1>
+    {% if request.args.error %}
+        <div class="alert alert-danger" role="alert">
+            {{ request.args.error }}
+            {% if request.args.errors %}
+                <ul class="mb-0">
+                    {% for error in request.args.errors.split(',') %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% elif request.args.message %}
+        <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
+    {% endif %}
+    <p>Cards should be formatted like <code>1 Access Tunnel [MKC]</code> or <code>1 Banquet Guests &lt;showcase&gt; [LTC]</code>. Basic lands will be skipped over.</p>
+    <form action="/card/import" method="post">
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="cardsType" id="regularCardsRadio" value="regular" checked>
+                <label class="form-check-label" for="regularCardsRadio">Regular Cards</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="cardsType" id="foilCardsRadio" value="foil">
+                <label class="form-check-label" for="foilCardsRadio">Foil Cards</label>
+            </div>
+        </div>
+        <div class="mb-3">
+            <textarea class="form-control" placeholder="Enter card list" aria-label="Card List" name="cardList" rows="15"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Import</button>
+    </form>
+{% endblock %}

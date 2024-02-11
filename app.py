@@ -44,7 +44,6 @@ class Card(db.Model):
     set_id = db.Column(db.String)
     quantity = db.Column(db.Integer)
     foil = db.Column(db.String)
-    variation = db.Column(db.String)
     collector_number = db.Column(db.Integer)
     scryfall_id = db.Column(db.String)
     color_identity = db.Column(db.String)
@@ -59,7 +58,7 @@ class Card(db.Model):
 # Create the app
 app = Flask(__name__)
 
-# Load databae path from .env
+# Load database path from .env
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 
 # Initialize the app with the database
@@ -206,6 +205,128 @@ def add_card_from_scryfall(scryfall_id):
 
     db.session.commit()
     return redirect(url_for('add_card', message=message, error=error))
+
+@app.route("/card/import", methods=['GET', 'POST'])
+def import_cards():
+    if request.method == 'GET':
+        return render_template("import.html")
+    else:
+        message = None
+        error = None
+        errors = []
+
+        if request.form.get('cardList'):
+            cardList = request.form.get('cardList')
+            cardList = cardList.strip()
+            for line in cardList.split('\n'):
+                quantity = None
+                name = None
+                variant = None
+                set = None
+                foil = "regular"
+
+                # Handle card type
+                if request.form.get("cardsType"):
+                    if request.form.get("cardsType") == "foil":
+                        foil = "foil"
+
+                # Collect quantity and set since they're always first and last
+                line_parts = line.split(" ")
+                quantity = line_parts.pop(0)
+                set = line_parts.pop().replace('[', '').replace(']', '')
+
+                # Collect optional varient if it's the last item
+                if "<" in line_parts[-1]:
+                    variant = line_parts.pop().replace('<', '').replace('>', '')
+                
+                # The rest of the words should be the name
+                name = " ".join(line_parts)
+                
+                if name.lower() not in ("plains", "island", "swamp", "mountain", "forest"):
+                    # Obtain Scryfall card
+                    if variant:
+                        res = requests.get(f"https://api.scryfall.com/cards/search?q={name}+game:paper+set:{set}+is:{variant}")
+                    else:
+                        res = requests.get(f"https://api.scryfall.com/cards/search?q={name}+game:paper+set:{set}")
+                    data = res.json()
+                    
+                    if res.status_code == 200:
+                        if 'data' in data:
+                            if len(data['data']) > 0:
+                                card = data['data'][0]
+
+                                scryfall_id = None
+                                name = None
+                                set_id = None
+                                collector_number = None
+                                color_identity = None
+                                type_line = None
+                                cmc = None
+                                power = None
+                                toughness = None
+                                rarity = None
+
+                                if 'id' in card:
+                                    scryfall_id = card['id']
+                                if 'name' in card:
+                                    name = card['name']
+                                if 'set' in card:
+                                    set_id = card['set'].upper()
+                                if 'collector_number' in card:
+                                    collector_number = card['collector_number']
+                                if 'color_identity' in card:
+                                    if card['color_identity'] != []:
+                                        color_identity = ",".join(card['color_identity'])
+                                if 'type_line' in card:
+                                    type_line = card['type_line']
+                                if 'cmc' in card:
+                                    cmc = card['cmc']
+                                if 'power' in card:
+                                    power = card['power']
+                                if 'toughness' in card:
+                                    toughness = card['toughness']
+                                if 'rarity' in card:
+                                    rarity = card['rarity']
+
+                                new_card = Card(
+                                    name=name,
+                                    set_id=set_id,
+                                    quantity=quantity,
+                                    foil=foil,
+                                    collector_number=collector_number,
+                                    scryfall_id=scryfall_id,
+                                    color_identity=color_identity,
+                                    type_line=type_line,
+                                    cmc=cmc,
+                                    power=power,
+                                    toughness=toughness,
+                                    rarity=rarity
+                                )
+                                db.session.add(new_card)
+                            else:
+                                error = True
+                                errors.append(line)
+                        else:
+                            error = True
+                            errors.append(line)
+                    else:
+                        error = True
+                        errors.append(line)
+        else:
+            error = "A card list is required to import"
+
+        if not error:
+            db.session.commit()
+            message = "Successfully imported all cards to collection"
+        elif error == True:
+            error = "Unable to retrive the following cards from Scryfall. No cards have been imported."
+        
+        if len(errors) == 0:
+            errors = None
+        else:
+            errors = ",".join(errors)
+            
+        return redirect(url_for("import_cards", message=message, error=error, errors=errors))
 
 @app.route("/decks")
 def decks():
