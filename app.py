@@ -1,4 +1,6 @@
 import os
+import json
+import requests
 import urllib.parse
 
 from flask import Flask, render_template, request, redirect, url_for
@@ -128,6 +130,82 @@ def card(id):
     cards = db.session.execute(db.select(Card).where(Card.name == card.name)).scalars().all()
     decks = db.session.execute(db.select(Deck)).scalars().all()
     return render_template("card.html", card=card, cards=cards, decks=decks)
+
+@app.route("/card/add")
+def add_card():
+    return render_template("add-card.html")
+    
+@app.route("/card/add/<scryfall_id>")
+def add_card_from_scryfall(scryfall_id):
+    message = None
+    error = None
+
+    # Handle foils
+    foil = 'regular'
+    if request.args.get('foil'):
+        foil = 'foil'
+    
+    existing_card = db.session.execute(db.select(Card).where(Card.scryfall_id == scryfall_id).where(Card.foil == foil)).scalar()
+
+    if existing_card:
+        existing_card.quantity += 1
+        message = f"{existing_card.name}'s quantity has been increased"
+    else:
+        res = requests.get(f'https://api.scryfall.com/cards/{scryfall_id}')
+        if res.status_code == 200:
+            data = json.loads(res.text)
+
+            name = None
+            set_id = None
+            collector_number = None
+            color_identity = None
+            type_line = None
+            cmc = None
+            power = None
+            toughness = None
+            rarity = None
+
+            if 'name' in data:
+                name = data['name']
+            if 'set' in data:
+                set_id = data['set'].upper()
+            if 'collector_number' in data:
+                collector_number = data['collector_number']
+            if 'color_identity' in data:
+                if data['color_identity'] != []:
+                    color_identity = ",".join(data['color_identity'])
+            if 'type_line' in data:
+                type_line = data['type_line']
+            if 'cmc' in data:
+                cmc = data['cmc']
+            if 'power' in data:
+                power = data['power']
+            if 'toughness' in data:
+                toughness = data['toughness']
+            if 'rarity' in data:
+                rarity = data['rarity']
+
+            new_card = Card(
+                name=name,
+                set_id=set_id,
+                quantity=1,
+                foil=foil,
+                collector_number=collector_number,
+                scryfall_id=scryfall_id,
+                color_identity=color_identity,
+                type_line=type_line,
+                cmc=cmc,
+                power=power,
+                toughness=toughness,
+                rarity=rarity
+            )
+            db.session.add(new_card)
+            message = f"{name} has been added to your collection"
+        else:
+            error = "An error has occured when trying to add the card"
+
+    db.session.commit()
+    return redirect(url_for('add_card', message=message, error=error))
 
 @app.route("/decks")
 def decks():

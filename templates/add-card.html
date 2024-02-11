@@ -1,0 +1,189 @@
+{% extends 'include/base.html' %}
+
+{% block title %}Add Card{% endblock %}
+
+{% block main %}
+    <h1>Add Card</h1>
+    {% if request.args.error %}
+        <div class="alert alert-danger" role="alert">{{ request.args.error }}</div>
+    {% elif request.args.message %}
+        <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+    {% endif %}
+    <form id="nameSearchForm">
+        <div class="mt-3 d-flex align-items-center gap-3">
+            <div class="w-100">
+                <input class="form-control" list="nameListOptions" placeholder="Name" aria-label="Name" name="name" id="nameInput" autocomplete="off">
+                <datalist id="nameListOptions"></datalist>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+    <div class="row" id="dataBody" hidden>
+        <div class="col-3">
+            <div class="sticky-top pt-3">
+                <img class="img-fluid rounded-4" id="cardImage">
+            </div>
+        </div>
+        <div class="col-9">
+            <table class="table table-striped table-bordered table-hover mt-3">
+                <thead class="sticky-top">
+                    <tr>
+                        <th scope="col">Set ID</th>
+                        <th scope="col">Collector Number</th>
+                        <th scope="col">Rarity</th>
+                        <th scope="col">Regular Price</th>
+                        <th scope="col">Foil Price</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody class="align-middle" id="cardTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+    <div id="dataLoading" hidden>
+        <div class="d-flex justify-content-center my-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-danger" role="alert" id="dataError" hidden></div>
+    <!-- Datalist Autocomplete -->
+    <script defer>
+        const nameInput = document.querySelector('#nameInput');
+        const dataList = document.querySelector('#nameListOptions')
+        nameInput.addEventListener('input', () => {
+            if (nameInput.value.length > 1) {
+                fetch(`https://api.scryfall.com/cards/autocomplete?q=${nameInput.value}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        dataList.innerHTML = '';
+                        if (data?.data?.length > 0) {
+                            data.data.forEach(card => {
+                                const option = document.createElement('option');
+                                option.value = card;
+                                dataList.appendChild(option);
+                            });
+                        }
+                    });
+            }
+        });
+    </script>
+    <!-- Search Form -->
+    <script defer>
+        const dataBody = document.querySelector('#dataBody');
+        const dataError = document.querySelector('#dataError');
+        const dataLoading = document.querySelector('#dataLoading');
+        const form = document.querySelector('#nameSearchForm');
+        const cardTableBody = document.querySelector('#cardTableBody');
+        const cardImageEl = document.querySelector('#cardImage');
+
+        const throwError = (error) => {
+            dataError.innerText = error;
+            dataBody.hidden = true;
+            dataError.hidden = false;
+            dataLoading.hidden = true;
+        };
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            nameInput.blur();
+
+            // Handle view state
+            dataBody.hidden = true;
+            dataError.hidden = true;
+            dataLoading.hidden = false;
+
+            if (nameInput.value.length > 1) {
+                fetch(`https://api.scryfall.com/cards/named?fuzzy=${nameInput.value}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data?.prints_search_uri) {
+                            fetch(data.prints_search_uri)
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data?.data?.length > 0) {
+                                        cardTableBody.innerHTML = '';
+
+                                        // Create table row for each card printing
+                                        data.data.forEach(card => {
+                                            if (card?.games?.includes("paper")) {
+                                                const row = document.createElement('tr');
+                                                const setIdCell = document.createElement('td');
+                                                const collectorNumberCell = document.createElement('td');
+                                                const rarityCell = document.createElement('td');
+                                                const regularPriceCell = document.createElement('td');
+                                                const foilPriceCell = document.createElement('td');
+                                                const addToCollectionCell = document.createElement('td');
+                                                const addToCollectionFoilCell = document.createElement('td');
+
+                                                row.dataset.scryfallId = card?.id;
+
+                                                setIdCell.classList.add('text-uppercase');
+                                                rarityCell.classList.add('text-capitalize');
+                                                addToCollectionCell.classList.add('text-center');
+                                                addToCollectionFoilCell.classList.add('text-center');
+                                                
+                                                setIdCell.innerText = card?.set;
+                                                collectorNumberCell.innerText = card?.collector_number;
+                                                rarityCell.innerText = card?.rarity;
+                                                regularPriceCell.innerText = card?.prices?.usd ? `$${card.prices.usd}` : ''
+                                                foilPriceCell.innerText = card?.prices?.usd_foil ? `$${card.prices.usd_foil}` : ''
+                                                addToCollectionCell.innerHTML = `
+                                                    <a href="/card/add/${card.id}" data-bs-toggle="tooltip" data-bs-title="Add Regular to Collection">
+                                                        <i class="bi-plus-circle-fill"></i>
+                                                    </a>
+                                                `;
+                                                addToCollectionFoilCell.innerHTML = `
+                                                    <a href="/card/add/${card.id}?foil=true" data-bs-toggle="tooltip" data-bs-title="Add Foil to Collection">
+                                                        <i class="bi-brightness-high-fill"></i>
+                                                    </a>
+                                                `;
+
+                                                row.appendChild(setIdCell);
+                                                row.appendChild(collectorNumberCell);
+                                                row.appendChild(rarityCell);
+                                                row.appendChild(regularPriceCell);
+                                                row.appendChild(foilPriceCell);
+                                                row.appendChild(addToCollectionCell);
+                                                row.appendChild(addToCollectionFoilCell);
+                                                cardTableBody.appendChild(row);
+                                            }
+                                        });
+
+                                        // Dynamically show the card image on hover
+                                        const rows = document.querySelectorAll('[data-scryfall-id]');
+                                        cardImageEl.src = `https://api.scryfall.com/cards/${rows[0].dataset.scryfallId}?format=image`;
+                                        rows.forEach(row => {
+                                            row.addEventListener('mouseover', () => {
+                                                cardImageEl.src = `https://api.scryfall.com/cards/${row.dataset.scryfallId}?format=image`;
+                                            });
+                                        });
+
+                                        // Enable tooltips
+                                        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                                        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+                                        // Handle view state
+                                        dataBody.hidden = false;
+                                        dataError.hidden = true;
+                                        dataLoading.hidden = true;
+                                    } else {
+                                        throwError("Error loading card printings")
+                                    }
+                                });
+                        } else {
+                            throwError("Could not find a card by that name")
+                        }
+                    });
+            } else {
+                throwError("A search must have more than 2 characters");
+            }
+        });
+    </script>
+{% endblock %}
