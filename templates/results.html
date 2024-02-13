@@ -4,7 +4,8 @@
 
 {% block main %}
     <h1>Search Results</h1>
-    <div class="row g-4 mt-2 js-cards">
+    <p>Found {{ "{:,}".format(cards.total) }} results</p>
+    <div class="row g-4 js-cards">
         {% include 'api/cards.html' %}
     </div>
     <!-- Infinite Scrolling -->

@@ -49,9 +49,13 @@
         </div>
     </div>
     <div class="alert alert-danger" role="alert" id="dataError" hidden></div>
-    <!-- Datalist Autocomplete -->
+    <!-- Focus Search Input on Load -->
     <script defer>
         const nameInput = document.querySelector('#nameInput');
+        nameInput.focus();
+    </script>
+    <!-- Datalist Autocomplete -->
+    <script defer>
         const dataList = document.querySelector('#nameListOptions')
         nameInput.addEventListener('input', () => {
             if (nameInput.value.length > 1) {

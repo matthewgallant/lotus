@@ -11,31 +11,31 @@
         <div class="row my-4">
             <div class="col">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="plains" name="plains" placeholder="Plains" value="{{ deck.plains }}">
+                    <input type="number" class="form-control" id="plains" name="plains" placeholder="Plains" value="{{ deck.plains|default('', true) }}">
                     <label for="plains">Plains</label>
                 </div>
             </div>
             <div class="col">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="island" name="island" placeholder="Island" value="{{ deck.island }}">
+                    <input type="number" class="form-control" id="island" name="island" placeholder="Island" value="{{ deck.island|default('', true) }}">
                     <label for="island">Island</label>
                 </div>
             </div>
             <div class="col">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="swamp" name="swamp" placeholder="Swamp" value="{{ deck.swamp }}">
+                    <input type="number" class="form-control" id="swamp" name="swamp" placeholder="Swamp" value="{{ deck.swamp|default('', true) }}">
                     <label for="swamp">Swamp</label>
                 </div>
             </div>
             <div class="col">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="mountain" name="mountain" placeholder="Mountain" value="{{ deck.mountain }}">
+                    <input type="number" class="form-control" id="mountain" name="mountain" placeholder="Mountain" value="{{ deck.mountain|default('', true) }}">
                     <label for="mountain">Mountain</label>
                 </div>
             </div>
             <div class="col">
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="forest" name="forest" placeholder="Forest" value="{{ deck.forest }}">
+                    <input type="number" class="form-control" id="forest" name="forest" placeholder="Forest" value="{{ deck.forest|default('', true) }}">
                     <label for="forest">Forest</label>
                 </div>
             </div>

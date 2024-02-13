@@ -1,7 +1,7 @@
 {% if cards.items|length > 0 %}
     {% for card in cards %}
         <div class="col-3 js-card">
-            <a href="{{ url_for('card', id=card.id) }}" target="_blank">
+            <a href="{{ url_for('card', id=card.id) }}">
                 <img src="https://api.scryfall.com/cards/{{ card.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ card.name }}" loading="lazy">
             </a>
         </div>
