@@ -9,7 +9,7 @@
             {{ request.args.error }}
             {% if request.args.errors %}
                 <ul class="mb-0">
-                    {% for error in request.args.errors.split(',') %}
+                    {% for error in request.args.errors.split('|') %}
                         <li>{{ error }}</li>
                     {% endfor %}
                 </ul>

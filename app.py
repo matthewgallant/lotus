@@ -1,7 +1,6 @@
 import os
 import json
 import requests
-import urllib.parse
 
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
@@ -15,9 +14,9 @@ db = SQLAlchemy(model_class=Base)
 class DeckCard(db.Model):
     __tablename__ = "decks_cards"
 
-    id = db.Column(db.Integer, primary_key=True)
-    deck_id = db.Column(db.Integer, db.ForeignKey('decks.id'))
-    card_id = db.Column(db.Integer, db.ForeignKey('cards.id'))
+    id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    deck_id = db.Column(db.Integer, db.ForeignKey('decks.id'), nullable=False)
+    card_id = db.Column(db.Integer, db.ForeignKey('cards.id'), nullable=False)
     is_commander = db.Column(db.Boolean)
 
     deck = db.relationship('Deck', back_populates='cards')
@@ -26,7 +25,7 @@ class DeckCard(db.Model):
 class Deck(db.Model):
     __tablename__ = "decks"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     name = db.Column(db.String, nullable=False)
     plains = db.Column(db.Integer)
     island = db.Column(db.Integer)
@@ -39,19 +38,20 @@ class Deck(db.Model):
 class Card(db.Model):
     __tablename__ = "cards"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     name = db.Column(db.String, nullable=False)
     set_id = db.Column(db.String)
     quantity = db.Column(db.Integer)
     foil = db.Column(db.String)
     collector_number = db.Column(db.Integer)
-    scryfall_id = db.Column(db.String)
+    scryfall_id = db.Column(db.String, nullable=False)
     color_identity = db.Column(db.String)
     type_line = db.Column(db.String)
     cmc = db.Column(db.Integer)
     power = db.Column(db.Integer)
     toughness = db.Column(db.Integer)
     rarity = db.Column(db.String)
+    text = db.Column(db.String)
 
     decks = db.relationship('DeckCard', back_populates='card')
 
@@ -67,9 +67,14 @@ db.init_app(app)
 def handle_search():
     query = db.select(Card).group_by(Card.name)
 
-    # Handle color searches
     if request.args.get('name'):
         query = query.where(Card.name.like(f'%{request.args.get("name")}%'))
+    if request.args.get('text'):
+        query = query.where(Card.text.like(f'%{request.args.get("text")}%'))
+    if request.args.get('type'):
+        query = query.where(Card.type_line.like(f'%{request.args.get("type")}%'))
+    if request.args.get('rarity'):
+        query = query.where(Card.rarity == request.args.get('rarity'))
     if request.args.get('color'):
         colors = request.args.get('color').split(',')
         core_colors = ['w', 'u', 'b', 'r', 'g']
@@ -81,8 +86,6 @@ def handle_search():
                     query = query.where(Card.color_identity.contains(color))
                 else:
                     query = query.where(Card.color_identity.notlike(f'%{color}%'))
-    if request.args.get('type'):
-        query = query.where(Card.type_line.like(f'%{request.args.get("type")}%'))
     
     return db.paginate(query, per_page=12)
 
@@ -98,17 +101,22 @@ def search():
 @app.route("/results", methods=['GET', 'POST'])
 def results():
     if request.method == 'POST':
-        # Process POST data
         params = {}
+
+        # Process POST data
         if request.form.get('name'):
-            params['name'] = request.form.get('name')
+            params['name'] = request.form.get('name').strip().lower()
+        if request.form.get('text'):
+            params['text'] = request.form.get('text').strip().lower()
+        if request.form.get('type'):
+            params['type'] = request.form.get('type').strip().lower()
+        if request.form.get('rarity'):
+            params['rarity'] = request.form.get('rarity')
         if len(request.form.getlist('color')) > 0:
             params['color'] = ",".join(request.form.getlist("color"))
-        if request.form.get('type'):
-            params['type'] = request.form.get('type')
         
         # Redirect to GET url
-        return redirect(f'/results?{urllib.parse.urlencode(params)}')
+        return redirect(url_for('results', **params))
     else:
         cards = handle_search()
 
@@ -127,7 +135,7 @@ def api_cards():
 def card(id):
     card = db.get_or_404(Card, id)
     cards = db.session.execute(db.select(Card).where(Card.name == card.name)).scalars().all()
-    decks = db.session.execute(db.select(Deck)).scalars().all()
+    decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
     return render_template("card.html", card=card, cards=cards, decks=decks)
 
 @app.route("/card/add")
@@ -163,6 +171,7 @@ def add_card_from_scryfall(scryfall_id):
             power = None
             toughness = None
             rarity = None
+            text = None
 
             if 'name' in data:
                 name = data['name']
@@ -183,6 +192,8 @@ def add_card_from_scryfall(scryfall_id):
                 toughness = data['toughness']
             if 'rarity' in data:
                 rarity = data['rarity']
+            if 'oracle_text' in data:
+                text = data['oracle_text']
 
             new_card = Card(
                 name=name,
@@ -196,7 +207,8 @@ def add_card_from_scryfall(scryfall_id):
                 cmc=cmc,
                 power=power,
                 toughness=toughness,
-                rarity=rarity
+                rarity=rarity,
+                text=text
             )
             db.session.add(new_card)
             message = f"{name} has been added to your collection"
@@ -265,6 +277,7 @@ def import_cards():
                                 power = None
                                 toughness = None
                                 rarity = None
+                                text = None
 
                                 if 'id' in card:
                                     scryfall_id = card['id']
@@ -287,6 +300,8 @@ def import_cards():
                                     toughness = card['toughness']
                                 if 'rarity' in card:
                                     rarity = card['rarity']
+                                if 'oracle_text' in card:
+                                    text = card['oracle_text']
 
                                 new_card = Card(
                                     name=name,
@@ -300,7 +315,8 @@ def import_cards():
                                     cmc=cmc,
                                     power=power,
                                     toughness=toughness,
-                                    rarity=rarity
+                                    rarity=rarity,
+                                    text=text
                                 )
                                 db.session.add(new_card)
                             else:
@@ -324,13 +340,13 @@ def import_cards():
         if len(errors) == 0:
             errors = None
         else:
-            errors = ",".join(errors)
+            errors = "|".join(errors)
             
         return redirect(url_for("import_cards", message=message, error=error, errors=errors))
 
 @app.route("/decks")
 def decks():
-    decks = db.session.execute(db.select(Deck)).scalars().all()
+    decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
     return render_template("decks.html", decks=decks)
 
 @app.route("/decks/add", methods=['GET', 'POST'])

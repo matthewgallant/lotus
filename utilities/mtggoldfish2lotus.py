@@ -57,6 +57,7 @@ for row in reader:
     power = None
     toughness = None
     rarity = None
+    text = None
 
     # Attempt to locate card on Scryfall
     if scryfall_id:
@@ -103,6 +104,8 @@ for row in reader:
         set_id = data['set'].upper()
     if 'collector_number' in data:
         collector_number = data['collector_number']
+    if 'oracle_text' in data:
+        text = data['oracle_text']
 
     # Insert new row
     if scryfall_id:
@@ -120,10 +123,11 @@ for row in reader:
                 cmc,
                 power,
                 toughness,
-                rarity
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                rarity,
+                text
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (name, set_id, quantity, foil, collector_number, scryfall_id, color_identity, type_line, cmc, power, toughness, rarity)
+            (name, set_id, quantity, foil, collector_number, scryfall_id, color_identity, type_line, cmc, power, toughness, rarity, text)
         )
     else:
         print(f"No Scryfall ID found for {name}")
