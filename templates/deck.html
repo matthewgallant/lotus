@@ -108,12 +108,15 @@
                 .then(data => {
                     const priceEl = row.querySelector('.js-price');
                     const foilEl = row.querySelector('.js-foil');
-                    if (foilEl.innerText == 'Regular') {
+                    if (foilEl.innerText == 'Regular' && data?.prices?.usd) {
                         totalPrice += parseFloat(data['prices']['usd']);
                         priceEl.innerText = `$${data['prices']['usd']}`;
-                    } else {
+                    } else if (data?.prices?.usd_foil) {
                         totalPrice += parseFloat(data['prices']['usd_foil']);
                         priceEl.innerText = `$${data['prices']['usd_foil']}`;
+                    } else if (data?.prices?.usd_etched) {
+                        totalPrice += parseFloat(data['prices']['usd_etched']);
+                        priceEl.innerText = `$${data['prices']['usd_etched']}`;
                     }
                     priceBadgeEl.innerText = `$${Math.round((totalPrice + Number.EPSILON) * 100) / 100}`;
                 });

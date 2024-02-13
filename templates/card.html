@@ -70,14 +70,16 @@
     <script defer>
         rows.forEach(row => {
             fetch(`https://api.scryfall.com/cards/${row.dataset.scryfallId}`)
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
                     const priceEl = row.querySelector('.js-price');
                     const foilEl = row.querySelector('.js-foil');
-                    if (foilEl.innerText == 'Regular') {
+                    if (foilEl.innerText == 'Regular' && data?.prices?.usd) {
                         priceEl.innerText = `$${data['prices']['usd']}`;
-                    } else {
+                    } else if (data?.prices?.usd_foil) {
                         priceEl.innerText = `$${data['prices']['usd_foil']}`;
+                    } else if (data?.prices?.usd_etched) {
+                        priceEl.innerText = `$${data['prices']['usd_etched']}`;
                     }
                 });
         });
