@@ -349,6 +349,28 @@ def import_cards():
             
         return redirect(url_for("import_cards", message=message, error=error, errors=errors))
 
+@app.route('/card/<card_id>/delete')
+def delete_card(card_id):
+    # Delete card associations
+    db.session.execute(db.delete(DeckCard).where(DeckCard.card_id == card_id))
+
+    # Delete card
+    card = db.get_or_404(Card, card_id)
+    db.session.delete(card)
+
+    db.session.commit()
+    return render_template("delete-card.html", message=f"{card.name} has been deleted")
+
+@app.route('/card/<card_id>/quantity', methods=['POST'])
+def edit_card_quantity(card_id):
+    if request.form.get('quantity'):
+        card = db.get_or_404(Card, card_id)
+        card.quantity = request.form.get('quantity')
+        db.session.commit()
+        return redirect(url_for('card', id=card_id, message=f"The quantity has been increased to {request.form.get('quantity')}"))
+    else:
+        return redirect(url_for('card', id=card_id, error=f"A quantity is required to update"))
+    
 @app.route("/decks")
 def decks():
     decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()

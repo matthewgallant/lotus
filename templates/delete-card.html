@@ -1,0 +1,10 @@
+{% extends 'include/base.html' %}
+
+{% block title %}Delete Card{% endblock %}
+
+{% block main %}
+    <h1>Delete Card</h1>
+    {% if message %}
+        <div class="alert alert-success" role="alert">{{ message }}</div>
+    {% endif %}
+{% endblock %}
