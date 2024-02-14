@@ -23,17 +23,41 @@
                 </li>
             </ul>
             <form class="d-flex" role="search" action="/results" method="post">
-                <input class="form-control me-2" id="searchInput" type="search" placeholder="Search: &#8984; + /" aria-label="Search" name="name" autocomplete="off">
+                <input class="form-control me-2" list="searchListOptions" id="searchInput" type="search" placeholder="Search: &#8984; + /" aria-label="Search" name="name" autocomplete="off">
+                <datalist id="searchListOptions"></datalist>
                 <button class="btn btn-outline-light" type="submit">Search</button>
             </form>
         </div>
     </div>
 </nav>
+<!-- Keyboard Shortcut to Search -->
 <script defer>
     const searchInput = document.querySelector('#searchInput');
     document.addEventListener('keydown', (e) => {
         if (e.metaKey && e.keyCode === 191) {
             searchInput.focus();
+        }
+    });
+</script>
+<script defer>
+    const dataList = document.querySelector('#searchListOptions')
+    searchInput.addEventListener('input', () => {
+        if (searchInput.value.length > 2) {
+            let form = new FormData();
+            form.append("query", searchInput.value);
+            fetch("{{ url_for('autocomplete') }}", { method: 'POST', body: form })
+                .then(res => res.json())
+                .then(data => {
+                    dataList.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(cardName => {
+                            const option = document.createElement('option');
+                            option.value = cardName;
+                            dataList.appendChild(option);
+                        });
+                    }
+                    console.log(data);
+                });
         }
     });
 </script>

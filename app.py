@@ -451,6 +451,12 @@ def delete_deck(deck_id):
     db.session.commit()
     return redirect(url_for('decks', message=f"{deck.name} has been deleted"))
 
+@app.route('/search/autocomplete', methods=['POST'])
+def autocomplete():
+    if request.form.get("query"):
+        cards = db.session.execute(db.select(Card.name).where(Card.name.like(f'%{request.form.get("query")}%'))).scalars().all()
+        return cards
+
 @app.errorhandler(404) 
 def not_found(error):
     return render_template("404.html")
