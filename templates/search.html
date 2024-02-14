@@ -29,6 +29,15 @@
             <input class="form-control" name="text" id="textInput" autocomplete="off" placeholder="Enter some card text...">
         </div>
         <div class="input-group mb-3">
+            <label for="setDatalist" class="input-group-text">Set</label>
+            <input class="form-control" list="setOptions" id="setDatalist" name="set" placeholder="Type to search...">
+            <datalist id="setOptions">
+                {% for set in sets %}
+                    <option value="{{ set.set_id }}">
+                {% endfor %}
+            </datalist>
+        </div>
+        <div class="input-group mb-3">
             <label for="raritySelect" class="input-group-text">Rarity</label>
             <select class="form-select" aria-label="Rarity" name="rarity" id="raritySelect">
                 <option value="" selected>Choose a rarity...</option>

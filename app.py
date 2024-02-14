@@ -73,6 +73,8 @@ def handle_search():
         query = query.where(Card.text.like(f'%{request.args.get("text")}%'))
     if request.args.get('type'):
         query = query.where(Card.type_line.like(f'%{request.args.get("type")}%'))
+    if request.args.get('set'):
+        query = query.where(Card.set_id == request.args.get('set'))
     if request.args.get('rarity'):
         query = query.where(Card.rarity == request.args.get('rarity'))
     if request.args.get('color'):
@@ -96,7 +98,8 @@ def home():
 
 @app.route("/search")
 def search():
-    return render_template("search.html")
+    sets = db.session.execute(db.select(Card.set_id).group_by(Card.set_id))
+    return render_template("search.html", sets=sets)
 
 @app.route("/results", methods=['GET', 'POST'])
 def results():
@@ -110,6 +113,8 @@ def results():
             params['text'] = request.form.get('text').strip().lower()
         if request.form.get('type'):
             params['type'] = request.form.get('type').strip().lower()
+        if request.form.get('set'):
+            params['set'] = request.form.get('set').strip().upper()
         if request.form.get('rarity'):
             params['rarity'] = request.form.get('rarity')
         if len(request.form.getlist('color')) > 0:
