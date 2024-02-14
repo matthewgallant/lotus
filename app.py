@@ -185,7 +185,7 @@ def add_card_from_scryfall(scryfall_id):
             if 'collector_number' in data:
                 collector_number = data['collector_number']
             if 'color_identity' in data:
-                if data['color_identity'] != []:
+                if data['color_identity']:
                     color_identity = ",".join(data['color_identity'])
             if 'type_line' in data:
                 type_line = data['type_line']

@@ -88,7 +88,7 @@ for row in reader:
     if 'id' in data:
         scryfall_id = data['id']
     if 'color_identity' in data:
-        if data['color_identity'] != []:
+        if data['color_identity']:
             color_identity = ",".join(data['color_identity'])
     if 'type_line' in data:
         type_line = data['type_line']
