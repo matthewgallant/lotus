@@ -1,0 +1,43 @@
+{% extends 'include/base.html' %}
+
+{% block title %}Decks with {{ card.name }}{% endblock %}
+
+{% block main %}
+    <h1>Decks with {{ card.name }}</h1>
+    {% if request.args.message %}
+        <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
+    {% endif %}
+    {% if card.decks|length > 0 %}
+        <table class="table table-striped table-bordered table-hover mt-3">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assoc in card.decks %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('deck', id=assoc.deck.id) }}">{{ assoc.deck.name }}</a>
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ url_for('remove_card_from_deck', deck_id=assoc.deck.id, card_id=card.id, assoc_id=assoc.id) }}" data-bs-toggle="tooltip" data-bs-title="Remove Card From Deck">
+                                <i class="bi-trash-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No associated decks found for {{ card.name }}.</p>
+    {% endif %}
+    <!-- Enable Tooltips -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        });
+    </script>
+{% endblock %}

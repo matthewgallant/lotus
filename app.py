@@ -371,6 +371,11 @@ def edit_card_quantity(card_id):
     else:
         return redirect(url_for('card', id=card_id, error=f"A quantity is required to update"))
     
+@app.route('/card/<card_id>/decks')
+def card_decks(card_id):
+    card = db.get_or_404(Card, card_id)
+    return render_template('card-decks.html', card=card)
+
 @app.route("/decks")
 def decks():
     decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
