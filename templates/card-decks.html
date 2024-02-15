@@ -33,11 +33,4 @@
     {% else %}
         <p>No associated decks found for {{ card.name }}.</p>
     {% endif %}
-    <!-- Enable Tooltips -->
-    <script defer>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-        });
-    </script>
 {% endblock %}

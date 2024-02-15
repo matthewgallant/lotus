@@ -8,45 +8,5 @@
     <div class="row g-4 js-cards">
         {% include 'api/cards.html' %}
     </div>
-    <!-- Infinite Scrolling -->
-    <script defer>
-        // Get required elements
-        const cardsEl = document.querySelector('.js-cards');
-        let cardEls = document.querySelectorAll('.js-card');
-
-        // Store page state
-        let page = 1;
-
-        // Create intersection observer for last card
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    // Delete last observer when done
-                    observer.unobserve(cardEls[cardEls.length - 1]);
-
-                    // Increment the page state
-                    page = page + 1;
-
-                    // Request another page of cards
-                    fetch(`/api/cards${window.location.search}&page=${page}`)
-                        .then(response => response.text())
-                        .then(html => {
-                            // Inject cards HTML
-                            cardsEl.innerHTML += html;
-
-                            // Create observer for new last card
-                            cardEls = document.querySelectorAll('.js-card');
-                            if (cardEls.length % 12 == 0) {
-                                observer.observe(cardEls[cardEls.length - 1]);
-                            }
-                        });
-                }
-            });
-        });
-
-        // Only observe if we have a full dataset
-        if (cardEls.length % 12 == 0) {
-            observer.observe(cardEls[cardEls.length - 1]);
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/results.js') }}"></script>
 {% endblock %}

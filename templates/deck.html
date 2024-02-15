@@ -97,36 +97,5 @@
     {% else %}
         <p>No cards found for deck. <a href="/search">Find Some</a></p>
     {% endif %}
-    <!-- Live Price Loading -->
-    <script defer>
-        let totalPrice = 0;
-        const priceBadgeEl = document.querySelector('.js-priceBadge');
-        const rows = document.querySelectorAll('[data-scryfall-id]');
-        rows.forEach(row => {
-            fetch(`https://api.scryfall.com/cards/${row.dataset.scryfallId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const priceEl = row.querySelector('.js-price');
-                    const foilEl = row.querySelector('.js-foil');
-                    if (foilEl.innerText == 'Regular' && data?.prices?.usd) {
-                        totalPrice += parseFloat(data['prices']['usd']);
-                        priceEl.innerText = `$${data['prices']['usd']}`;
-                    } else if (data?.prices?.usd_foil) {
-                        totalPrice += parseFloat(data['prices']['usd_foil']);
-                        priceEl.innerText = `$${data['prices']['usd_foil']}`;
-                    } else if (data?.prices?.usd_etched) {
-                        totalPrice += parseFloat(data['prices']['usd_etched']);
-                        priceEl.innerText = `$${data['prices']['usd_etched']}`;
-                    }
-                    priceBadgeEl.innerText = `$${Math.round((totalPrice + Number.EPSILON) * 100) / 100}`;
-                });
-        });
-    </script>
-    <!-- Enable Tooltips -->
-    <script defer>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/deck.js') }}"></script>
 {% endblock %}
