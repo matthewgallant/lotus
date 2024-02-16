@@ -7,9 +7,11 @@ class DeckPage {
         this.totalPrice = 0;
         this.priceBadgeEl = document.querySelector('.js-priceBadge');
         this.rows = document.querySelectorAll('[data-scryfall-id]');
+        this.cardImageEl = document.querySelector('#cardImage');
 
         this.utilities = new Utilities();
 
+        this.utilities.enableDynamicCardImages(this.rows, this.cardImageEl);
         this.getPricingData();
     }
 
