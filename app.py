@@ -454,7 +454,11 @@ def delete_deck(deck_id):
 @app.route('/search/autocomplete', methods=['POST'])
 def autocomplete():
     if request.form.get("query"):
-        cards = db.session.execute(db.select(Card.name).where(Card.name.like(f'%{request.form.get("query")}%'))).scalars().all()
+        cards = db.session.execute(
+            db.select(Card.name)
+                .where(Card.name.like(f'%{request.form.get("query")}%'))
+                .group_by(Card.name)
+            ).scalars().all()
         return cards
 
 @app.errorhandler(404) 
