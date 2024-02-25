@@ -25,7 +25,7 @@ class Utilities {
                 .then(data => {
                     const priceEl = row.querySelector('.js-price');
                     const foilEl = row.querySelector('.js-foil');
-                    if (foilEl.innerText == 'Regular' && data?.prices?.usd) {
+                    if (foilEl.innerText.toLowerCase() === 'regular' && data.prices.usd) {
                         totalPrice += parseFloat(data['prices']['usd']);
                         priceEl.innerText = `$${data['prices']['usd']}`;
                     } else if (data?.prices?.usd_foil) {

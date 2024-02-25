@@ -25,7 +25,8 @@
                         <th scope="col">Foil</th>
                         <th scope="col">Collector Number</th>
                         <th scope="col">Price</th>
-                        <th scope="col">Add to Deck</th>
+                        <th scope="col">Add to Mainboard</th>
+                        <th scope="col">Add to Sideboard</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -68,12 +69,26 @@
                             <td>
                                 <div class="dropdown">
                                     <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Deck
+                                        Mainboard
                                     </button>
                                     <ul class="dropdown-menu">
                                         {% for deck in decks %}
                                             <li>
-                                                <a class="dropdown-item" href="{{ url_for('add_card_to_deck', deck_id=deck.id, card_id=card.id) }}">{{ deck.name }}</a>
+                                                <a class="dropdown-item" href="{{ url_for('add_card_to_deck', deck_id=deck.id, card_id=card.id, board='m') }}">{{ deck.name }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Sideboard
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {% for deck in decks %}
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('add_card_to_deck', deck_id=deck.id, card_id=card.id, board='s') }}">{{ deck.name }}</a>
                                             </li>
                                         {% endfor %}
                                     </ul>

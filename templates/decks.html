@@ -15,7 +15,8 @@
             <thead>
                 <tr>
                     <th scope="col">Name</th>
-                    <th scope="col">Cards</th>
+                    <th scope="col">Mainboard</th>
+                    <th scope="col">Sideboard</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -23,7 +24,8 @@
                 {% for deck in decks %}
                     <tr>
                         <td><a href="{{ url_for('deck', id=deck.id) }}">{{ deck.name }}</a></td>
-                        <td>{{ deck.cards|length + deck.plains|default(0, true) + deck.island|default(0, true) + deck.swamp|default(0, true) + deck.mountain|default(0, true) + deck.forest|default(0, true) }}</td>
+                        <td>{{ deck.mainboard|length + deck.plains|default(0, true) + deck.island|default(0, true) + deck.swamp|default(0, true) + deck.mountain|default(0, true) + deck.forest|default(0, true) }}</td>
+                        <td>{{ deck.sideboard|length }}</td>
                         <td class="text-center">
                             <a href="{{ url_for('delete_deck', deck_id=deck.id) }}" data-bs-toggle="tooltip" data-bs-title="Delete Deck">
                                 <i class="bi-trash-fill"></i>

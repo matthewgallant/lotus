@@ -5,6 +5,7 @@ import requests
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import and_
 
 class Base(DeclarativeBase):
     pass
@@ -18,8 +19,9 @@ class DeckCard(db.Model):
     deck_id = db.Column(db.Integer, db.ForeignKey('decks.id'), nullable=False)
     card_id = db.Column(db.Integer, db.ForeignKey('cards.id'), nullable=False)
     is_commander = db.Column(db.Boolean)
+    board = db.Column(db.String)
 
-    deck = db.relationship('Deck', back_populates='cards')
+    deck = db.relationship('Deck')
     card = db.relationship('Card', back_populates='decks')
 
 class Deck(db.Model):
@@ -33,7 +35,19 @@ class Deck(db.Model):
     mountain = db.Column(db.Integer)
     forest = db.Column(db.Integer)
 
-    cards = db.relationship('DeckCard', back_populates='deck', order_by='DeckCard.is_commander.desc()')
+    # cards = db.relationship('DeckCard', back_populates='deck', order_by='DeckCard.is_commander.desc()')
+    mainboard = db.relationship(
+        'DeckCard',
+        back_populates='deck',
+        order_by='DeckCard.is_commander.desc()',
+        primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board == 'm')
+    )
+    sideboard = db.relationship(
+        'DeckCard',
+        back_populates='deck',
+        order_by='DeckCard.is_commander.desc()',
+        primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board == 's')
+    )
 
 class Card(db.Model):
     __tablename__ = "cards"
@@ -408,13 +422,17 @@ def deck(id):
         db.session.commit()
         return render_template("deck.html", deck=deck)
 
-@app.route('/deck/<deck_id>/card/<card_id>/add')
-def add_card_to_deck(deck_id, card_id):
+@app.route('/deck/<deck_id>/card/<card_id>/add/<board>')
+def add_card_to_deck(deck_id, card_id, board):
     deck = db.get_or_404(Deck, deck_id)
     card = db.get_or_404(Card, card_id)
     deck_card = DeckCard()
     deck_card.card = card
-    deck.cards.append(deck_card)
+    deck_card.board = board
+    if board == 'm':
+        deck.mainboard.append(deck_card)
+    elif board == 's':
+        deck.sideboard.append(deck_card)
     db.session.commit()
     return redirect(url_for('card', id=card_id, message=f'{card.name} has been added to deck {deck.name}'))
 
@@ -430,14 +448,21 @@ def set_commander_for_deck(deck_id, assoc_id):
     assoc = db.session.execute(db.select(DeckCard).where(DeckCard.id == assoc_id)).scalar()
     assoc.is_commander = True
     db.session.commit()
-    return redirect(url_for('deck', id=deck_id))
+    return redirect(url_for('deck', id=deck_id, message="A new commander has been set"))
 
 @app.route('/deck/<deck_id>/assoc/<assoc_id>/commander/unset')
 def unset_commander_for_deck(deck_id, assoc_id):
     assoc = db.session.execute(db.select(DeckCard).where(DeckCard.id == assoc_id)).scalar()
     assoc.is_commander = False
     db.session.commit()
-    return redirect(url_for('deck', id=deck_id))
+    return redirect(url_for('deck', id=deck_id, message="The commander has been unset"))
+
+@app.route('/deck/<deck_id>/assoc/<assoc_id>/board/<board>')
+def move_card_board(deck_id, assoc_id, board):
+    assoc = db.session.execute(db.select(DeckCard).where(DeckCard.id == assoc_id)).scalar()
+    assoc.board = board
+    db.session.commit()
+    return redirect(url_for('deck', id=deck_id, message="The card's board has been updated"))
 
 @app.route('/deck/<deck_id>/delete')
 def delete_deck(deck_id):
