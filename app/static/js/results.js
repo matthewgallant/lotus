@@ -23,7 +23,7 @@ class ResultsPage {
                     this.page += 1;
 
                     // Request another page of cards
-                    fetch(`/cards/api/cards${window.location.search}&page=${this.page}`)
+                    fetch(`/search/api/cards${window.location.search}&page=${this.page}`)
                         .then(res => res.text())
                         .then(html => {
                             // Inject cards HTML

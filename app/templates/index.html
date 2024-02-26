@@ -5,5 +5,5 @@
 {% block main %}
     <h1>Welcome to Lotus!</h1>
     <p>You have {{ "{:,}".format(collection_total) }} cards in your collection.</p>
-    <a href="{{ url_for('cards.search') }}" class="btn btn-primary">Search my Collection</a>
+    <a href="{{ url_for('search.search') }}" class="btn btn-primary">Search my Collection</a>
 {% endblock %}

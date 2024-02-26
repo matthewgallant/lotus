@@ -10,73 +10,6 @@ from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 from app.models.card import Card
 
-def handle_search():
-    query = db.select(Card).group_by(Card.name)
-
-    if request.args.get('name'):
-        query = query.where(Card.name.like(f'%{request.args.get("name")}%'))
-    if request.args.get('text'):
-        query = query.where(Card.text.like(f'%{request.args.get("text")}%'))
-    if request.args.get('type'):
-        query = query.where(Card.type_line.like(f'%{request.args.get("type")}%'))
-    if request.args.get('set'):
-        query = query.where(Card.set_id == request.args.get('set'))
-    if request.args.get('rarity'):
-        query = query.where(Card.rarity == request.args.get('rarity'))
-    if request.args.get('color'):
-        colors = request.args.get('color').split(',')
-        core_colors = ['w', 'u', 'b', 'r', 'g']
-        if 'un' in colors:
-            query = query.where(Card.color_identity == None, Card.type_line.notlike('land'))
-        else:
-            for color in core_colors:
-                if color in colors:
-                    query = query.where(Card.color_identity.contains(color))
-                else:
-                    query = query.where(Card.color_identity.notlike(f'%{color}%'))
-    
-    return db.paginate(query, per_page=12)
-
-@bp.route("/search")
-def search():
-    sets = db.session.execute(db.select(Card.set_id).group_by(Card.set_id))
-    return render_template("cards/search.html", sets=sets)
-
-@bp.route("/", methods=['GET', 'POST'])
-def cards():
-    if request.method == 'POST':
-        params = {}
-
-        # Process POST data
-        if request.form.get('name'):
-            params['name'] = request.form.get('name').strip().lower()
-        if request.form.get('text'):
-            params['text'] = request.form.get('text').strip().lower()
-        if request.form.get('type'):
-            params['type'] = request.form.get('type').strip().lower()
-        if request.form.get('set'):
-            params['set'] = request.form.get('set').strip().upper()
-        if request.form.get('rarity'):
-            params['rarity'] = request.form.get('rarity')
-        if len(request.form.getlist('color')) > 0:
-            params['color'] = ",".join(request.form.getlist("color"))
-        
-        # Redirect to GET url
-        return redirect(url_for('cards.cards', **params))
-    else:
-        cards = handle_search()
-
-        # Redirect to card page if only 1 card is found
-        if cards.total == 1:
-            return redirect(url_for('cards.card', id=cards.items[0].id))
-        else:
-            return render_template("cards/cards.html", cards=cards)
-
-@bp.route("/api/cards")
-def api_cards():
-    cards = handle_search()
-    return render_template("cards/api/cards.html", cards=cards)
-
 @bp.route("/<id>")
 def card(id):
     card = db.get_or_404(Card, id)
@@ -84,6 +17,43 @@ def card(id):
     decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
     return render_template("cards/card.html", card=card, cards=cards, decks=decks)
 
+@bp.route('/<card_id>/delete')
+def delete_card(card_id):
+    # Delete card associations
+    db.session.execute(db.delete(DeckCard).where(DeckCard.card_id == card_id))
+
+    # Delete card
+    card = db.get_or_404(Card, card_id)
+    db.session.delete(card)
+
+    db.session.commit()
+    return render_template("cards/delete-card.html", message=f"{card.name} has been deleted")
+
+@bp.route('/<card_id>/quantity', methods=['POST'])
+def edit_card_quantity(card_id):
+    if request.form.get('quantity'):
+        card = db.get_or_404(Card, card_id)
+        card.quantity = request.form.get('quantity')
+        db.session.commit()
+        return redirect(url_for('cards.card', id=card_id, message=f"The quantity has been increased to {request.form.get('quantity')}"))
+    else:
+        return redirect(url_for('cards.card', id=card_id, error=f"A quantity is required to update"))
+    
+@bp.route('/<card_id>/decks')
+def card_decks(card_id):
+    card = db.get_or_404(Card, card_id)
+    return render_template("cards/card-decks.html", card=card)
+
+@bp.route('/autocomplete', methods=['POST'])
+def autocomplete():
+    if request.form.get("query"):
+        cards = db.session.execute(
+            db.select(Card.name)
+                .where(Card.name.like(f'%{request.form.get("query")}%'))
+                .group_by(Card.name)
+            ).scalars().all()
+        return cards
+    
 @bp.route("/add")
 def add_card():
     return render_template("cards/add-card.html")
@@ -289,40 +259,3 @@ def import_cards():
             errors = "|".join(errors)
             
         return redirect(url_for('cards.import_cards', message=message, error=error, errors=errors))
-
-@bp.route('/<card_id>/delete')
-def delete_card(card_id):
-    # Delete card associations
-    db.session.execute(db.delete(DeckCard).where(DeckCard.card_id == card_id))
-
-    # Delete card
-    card = db.get_or_404(Card, card_id)
-    db.session.delete(card)
-
-    db.session.commit()
-    return render_template("cards/delete-card.html", message=f"{card.name} has been deleted")
-
-@bp.route('/<card_id>/quantity', methods=['POST'])
-def edit_card_quantity(card_id):
-    if request.form.get('quantity'):
-        card = db.get_or_404(Card, card_id)
-        card.quantity = request.form.get('quantity')
-        db.session.commit()
-        return redirect(url_for('cards.card', id=card_id, message=f"The quantity has been increased to {request.form.get('quantity')}"))
-    else:
-        return redirect(url_for('cards.card', id=card_id, error=f"A quantity is required to update"))
-    
-@bp.route('/<card_id>/decks')
-def card_decks(card_id):
-    card = db.get_or_404(Card, card_id)
-    return render_template("cards/card-decks.html", card=card)
-
-@bp.route('/autocomplete', methods=['POST'])
-def autocomplete():
-    if request.form.get("query"):
-        cards = db.session.execute(
-            db.select(Card.name)
-                .where(Card.name.like(f'%{request.form.get("query")}%'))
-                .group_by(Card.name)
-            ).scalars().all()
-        return cards

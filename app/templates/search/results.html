@@ -6,7 +6,7 @@
     <h1>Search Results</h1>
     <p>Found {{ "{:,}".format(cards.total) }} results</p>
     <div class="row g-4 js-cards">
-        {% include 'cards/api/cards.html' %}
+        {% include 'search/api/cards.html' %}
     </div>
-    <script src="{{ url_for('static', filename='js/cards.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/results.js') }}"></script>
 {% endblock %}

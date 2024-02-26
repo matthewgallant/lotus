@@ -35,7 +35,7 @@
                             <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('cards.search') }}">Search</a>
+                            <a class="nav-link" href="{{ url_for('search.search') }}">Search</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('decks.decks') }}">Decks</a>
@@ -47,7 +47,7 @@
                             <a class="nav-link" href="{{ url_for('cards.import_cards') }}">Import</a>
                         </li>
                     </ul>
-                    <form class="d-flex" role="search" action="{{ url_for('cards.cards') }}" method="post">
+                    <form class="d-flex" role="search" action="{{ url_for('search.results') }}" method="post">
                         <input class="form-control me-2" list="searchListOptions" id="searchInput" type="search" placeholder="Search: &#8984; + /" aria-label="Search" name="name" autocomplete="off">
                         <datalist id="searchListOptions"></datalist>
                         <button class="btn btn-outline-light" type="submit">Search</button>

@@ -91,7 +91,7 @@
                     </div>
                 </div>
             {% else %}
-                <p>No cards found for mainboard. <a href="{{ url_for('cards.search') }}">Find Some</a></p>
+                <p>No cards found for mainboard. <a href="{{ url_for('search.search') }}">Find Some</a></p>
             {% endif %}
         </div>
         {% if deck.sideboard|length > 0 %}
