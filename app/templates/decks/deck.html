@@ -1,4 +1,4 @@
-{% extends 'include/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}{{ deck.name }}{% endblock %}
 
@@ -47,7 +47,7 @@
                                 {% for assoc in deck.mainboard %}
                                     <tr data-scryfall-id="{{ assoc.card.scryfall_id }}">
                                         <td>
-                                            <a href="{{ url_for('card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.name }}</a>
+                                            <a href="{{ url_for('cards.card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.name }}</a>
                                             {% if assoc.is_commander %}
                                                 <span class="badge bg-primary ms-1">Commander</span>
                                             {% endif %} 
@@ -65,19 +65,19 @@
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li>
-                                                        <a href="{{ url_for('move_card_board', deck_id=deck.id, assoc_id=assoc.id, board='s') }}" class="dropdown-item">
+                                                        <a href="{{ url_for('decks.move_card_board', deck_id=deck.id, assoc_id=assoc.id, board='s') }}" class="dropdown-item">
                                                             <i class="bi-arrow-right"></i> Sideboard
                                                         </a>
                                                         {% if assoc.is_commander %}
-                                                            <a href="{{ url_for('unset_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                            <a href="{{ url_for('decks.unset_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
                                                                 <i class="bi-person"></i> Unset Commander
                                                             </a>
                                                         {% else %}
-                                                            <a href="{{ url_for('set_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                            <a href="{{ url_for('decks.set_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
                                                                 <i class="bi-person-fill"></i> Set Commander
                                                             </a>
                                                         {% endif %}
-                                                        <a href="{{ url_for('remove_card_from_deck', deck_id=deck.id, card_id=assoc.card.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                        <a href="{{ url_for('decks.remove_card_from_deck', deck_id=deck.id, card_id=assoc.card.id, assoc_id=assoc.id) }}" class="dropdown-item">
                                                             <i class="bi-trash-fill"></i> Remove
                                                         </a>
                                                     </li>
@@ -91,7 +91,7 @@
                     </div>
                 </div>
             {% else %}
-                <p>No cards found for mainboard. <a href="/search">Find Some</a></p>
+                <p>No cards found for mainboard. <a href="{{ url_for('cards.search') }}">Find Some</a></p>
             {% endif %}
         </div>
         {% if deck.sideboard|length > 0 %}
@@ -120,7 +120,7 @@
                                 {% for assoc in deck.sideboard %}
                                     <tr data-scryfall-id="{{ assoc.card.scryfall_id }}">
                                         <td>
-                                            <a href="{{ url_for('card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.name }}</a>
+                                            <a href="{{ url_for('cards.card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.name }}</a>
                                             {% if assoc.is_commander %}
                                                 <span class="badge bg-primary ms-1">Commander</span>
                                             {% endif %} 
@@ -138,19 +138,19 @@
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li>
-                                                        <a href="{{ url_for('move_card_board', deck_id=deck.id, assoc_id=assoc.id, board='m') }}" class="dropdown-item">
+                                                        <a href="{{ url_for('decks.move_card_board', deck_id=deck.id, assoc_id=assoc.id, board='m') }}" class="dropdown-item">
                                                             <i class="bi-arrow-left"></i> Mainboard
                                                         </a>
                                                         {% if assoc.is_commander %}
-                                                            <a href="{{ url_for('unset_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                            <a href="{{ url_for('decks.unset_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
                                                                 <i class="bi-person"></i> Unset Commander
                                                             </a>
                                                         {% else %}
-                                                            <a href="{{ url_for('set_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                            <a href="{{ url_for('decks.set_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
                                                                 <i class="bi-person-fill"></i> Set Commander
                                                             </a>
                                                         {% endif %}
-                                                        <a href="{{ url_for('remove_card_from_deck', deck_id=deck.id, card_id=assoc.card.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                        <a href="{{ url_for('decks.remove_card_from_deck', deck_id=deck.id, card_id=assoc.card.id, assoc_id=assoc.id) }}" class="dropdown-item">
                                                             <i class="bi-trash-fill"></i> Remove
                                                         </a>
                                                     </li>
@@ -166,7 +166,7 @@
             </div>
         {% endif %}
         <div class="tab-pane fade" id="lands-tab-pane" role="tabpanel" aria-labelledby="lands-tab" tabindex="0">
-            <form action="{{ url_for('deck', id=deck.id) }}" method="post">
+            <form action="{{ url_for('decks.deck', id=deck.id) }}" method="post">
                 <div class="row my-4">
                     <div class="col">
                         <div class="form-floating">

@@ -1,4 +1,4 @@
-{% extends 'include/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Decks with {{ card.name }}{% endblock %}
 
@@ -20,11 +20,11 @@
                 {% for assoc in card.decks %}
                     <tr>
                         <td>
-                            <a href="{{ url_for('deck', id=assoc.deck.id) }}">{{ assoc.deck.name }}</a>
+                            <a href="{{ url_for('decks.deck', id=assoc.deck.id) }}">{{ assoc.deck.name }}</a>
                         </td>
                         <td>{{ 'Mainboard' if assoc.board == 'm' else 'Sideboard' }}</td>
                         <td class="text-center">
-                            <a href="{{ url_for('remove_card_from_deck', deck_id=assoc.deck.id, card_id=card.id, assoc_id=assoc.id) }}" data-bs-toggle="tooltip" data-bs-title="Remove Card From Deck">
+                            <a href="{{ url_for('decks.remove_card_from_deck', deck_id=assoc.deck.id, card_id=card.id, assoc_id=assoc.id) }}" data-bs-toggle="tooltip" data-bs-title="Remove Card From Deck">
                                 <i class="bi-trash-fill"></i>
                             </a>
                         </td>

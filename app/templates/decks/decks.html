@@ -1,4 +1,4 @@
-{% extends 'include/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Decks{% endblock %}
 
@@ -23,11 +23,11 @@
             <tbody>
                 {% for deck in decks %}
                     <tr>
-                        <td><a href="{{ url_for('deck', id=deck.id) }}">{{ deck.name }}</a></td>
+                        <td><a href="{{ url_for('decks.deck', id=deck.id) }}">{{ deck.name }}</a></td>
                         <td>{{ deck.mainboard|length + deck.plains|default(0, true) + deck.island|default(0, true) + deck.swamp|default(0, true) + deck.mountain|default(0, true) + deck.forest|default(0, true) }}</td>
                         <td>{{ deck.sideboard|length }}</td>
                         <td class="text-center">
-                            <a href="{{ url_for('delete_deck', deck_id=deck.id) }}" data-bs-toggle="tooltip" data-bs-title="Delete Deck">
+                            <a href="{{ url_for('decks.delete_deck', deck_id=deck.id) }}" data-bs-toggle="tooltip" data-bs-title="Delete Deck">
                                 <i class="bi-trash-fill"></i>
                             </a>
                         </td>

@@ -64,7 +64,7 @@ class Navbar {
             if (this.searchInput.value.length > 2) {
                 const form = new FormData();
                 form.append("query", this.searchInput.value);
-                fetch("/search/autocomplete", { method: 'POST', body: form })
+                fetch("/cards/autocomplete", { method: 'POST', body: form })
                     .then(res => res.json())
                     .then(data => {
                         this.dataList.innerHTML = '';

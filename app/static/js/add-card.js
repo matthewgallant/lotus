@@ -90,12 +90,12 @@ class AddCardPage {
                 regularPriceCell.innerText = card?.prices?.usd ? `$${card.prices.usd}` : ''
                 foilPriceCell.innerText = card?.prices?.usd_foil ? `$${card.prices.usd_foil}` : ''
                 addToCollectionCell.innerHTML = `
-                    <a href="/card/add/${card.id}" data-bs-toggle="tooltip" data-bs-title="Add Regular to Collection">
+                    <a href="/cards/add/${card.id}" data-bs-toggle="tooltip" data-bs-title="Add Regular to Collection">
                         <i class="bi-plus-circle-fill"></i>
                     </a>
                 `;
                 addToCollectionFoilCell.innerHTML = `
-                    <a href="/card/add/${card.id}?foil=true" data-bs-toggle="tooltip" data-bs-title="Add Foil to Collection">
+                    <a href="/cards/add/${card.id}?foil=true" data-bs-toggle="tooltip" data-bs-title="Add Foil to Collection">
                         <i class="bi-brightness-high-fill"></i>
                     </a>
                 `;

@@ -1,4 +1,4 @@
-{% extends 'include/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}{{ card.name }}{% endblock %}
 
@@ -43,7 +43,7 @@
                                                 <h1 class="modal-title fs-5" id="quantityModal{{ card.id }}Label">Edit Quantity</h1>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <form action="{{ url_for('edit_card_quantity', card_id=card.id) }}" method="post">
+                                            <form action="{{ url_for('cards.edit_card_quantity', card_id=card.id) }}" method="post">
                                                 <div class="modal-body">
                                                     <div class="input-group mb-3">
                                                         <label for="quantityInput" class="input-group-text">Quantity</label>
@@ -60,7 +60,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="{{ url_for('card_decks', card_id=card.id) }}">{{ card.quantity - card.decks|length }}</a>
+                                <a href="{{ url_for('cards.card_decks', card_id=card.id) }}">{{ card.quantity - card.decks|length }}</a>
                             </td>
                             <td class="text-capitalize">{{ card.rarity|default('N/A', 'true') }}</td>
                             <td class="text-capitalize js-foil">{{ card.foil|default('regular', 'true') }}</td>
@@ -74,7 +74,7 @@
                                     <ul class="dropdown-menu">
                                         {% for deck in decks %}
                                             <li>
-                                                <a class="dropdown-item" href="{{ url_for('add_card_to_deck', deck_id=deck.id, card_id=card.id, board='m') }}">{{ deck.name }}</a>
+                                                <a class="dropdown-item" href="{{ url_for('decks.add_card_to_deck', deck_id=deck.id, card_id=card.id, board='m') }}">{{ deck.name }}</a>
                                             </li>
                                         {% endfor %}
                                     </ul>
@@ -88,14 +88,14 @@
                                     <ul class="dropdown-menu">
                                         {% for deck in decks %}
                                             <li>
-                                                <a class="dropdown-item" href="{{ url_for('add_card_to_deck', deck_id=deck.id, card_id=card.id, board='s') }}">{{ deck.name }}</a>
+                                                <a class="dropdown-item" href="{{ url_for('decks.add_card_to_deck', deck_id=deck.id, card_id=card.id, board='s') }}">{{ deck.name }}</a>
                                             </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
                             </td>
                             <td class="text-center">
-                                <a href="{{ url_for('delete_card', card_id=card.id) }}" data-bs-toggle="tooltip" data-bs-title="Delete Card">
+                                <a href="{{ url_for('cards.delete_card', card_id=card.id) }}" data-bs-toggle="tooltip" data-bs-title="Delete Card">
                                     <i class="bi-trash-fill"></i>
                                 </a>
                             </td>

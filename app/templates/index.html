@@ -1,9 +1,9 @@
-{% extends 'include/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Home{% endblock %}
 
 {% block main %}
     <h1>Welcome to Lotus!</h1>
     <p>You have {{ "{:,}".format(collection_total) }} cards in your collection.</p>
-    <a href="/search" class="btn btn-primary">Search my Collection</a>
+    <a href="{{ url_for('cards.search') }}" class="btn btn-primary">Search my Collection</a>
 {% endblock %}

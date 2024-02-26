@@ -1,10 +1,10 @@
-{% extends 'include/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Search{% endblock %}
 
 {% block main %}
     <h1>Search</h1>
-    <form class="mt-4" action="{{ url_for('results') }}" method="post">
+    <form class="mt-4" action="{{ url_for('cards.cards') }}" method="post">
         <div class="input-group mb-3">
             <label for="nameInput" class="input-group-text">Name</label>
             <input class="form-control" name="name" id="nameInput" autocomplete="off" placeholder="Enter a name...">
