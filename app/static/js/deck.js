@@ -20,7 +20,7 @@ class DeckPage {
 
     async getPricingData() {
         this.totalPrice = await this.utilities.livePriceLoading(this.mainboardRows);
-        this.priceBadgeEl.innerText = `$${Math.round((this.totalPrice + Number.EPSILON) * 100) / 100}`;
+        this.priceBadgeEl.innerText = `$${(Math.round((this.totalPrice + Number.EPSILON) * 100) / 100).toFixed(2)}`;
 
         // Load sideboard prices after mainboard
         await this.utilities.livePriceLoading(this.sideboardRows);
