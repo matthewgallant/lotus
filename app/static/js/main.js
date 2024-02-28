@@ -9,11 +9,17 @@ class Utilities {
     }
 
     enableDynamicCardImages(rows, cardImageEl) {
-        rows.forEach(row => {
-            row.addEventListener('mouseover', () => {
-                cardImageEl.src = `https://api.scryfall.com/cards/${row.dataset.scryfallId}?format=image`;
+        if (rows.length > 0 && cardImageEl != null) {
+            // Set first image if needed
+            cardImageEl.src = `https://api.scryfall.com/cards/${rows[0].dataset.scryfallId}?format=image`;
+
+            // Then handle each row
+            rows.forEach(row => {
+                row.addEventListener('mouseover', () => {
+                    cardImageEl.src = `https://api.scryfall.com/cards/${row.dataset.scryfallId}?format=image`;
+                });
             });
-        });
+        }
     }
 
     async livePriceLoading(rows) {
