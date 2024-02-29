@@ -29,12 +29,13 @@
         <div class="tab-pane fade show active" id="mainboard-tab-pane" role="tabpanel" aria-labelledby="mainboard-tab" tabindex="0">
             {% if deck.mainboard|length > 0 %}
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-12 col-md-3">
                         <div class="sticky-top pt-3">
                             <img src="https://api.scryfall.com/cards/{{ deck.mainboard[0].card.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ deck.mainboard[0].card.name }}" id="mainboardCardImage">
                         </div>
                     </div>
-                    <div class="col-9">
+                    <div class="col-12 col-md-9 mt-4 mt-md-0">
+                        <div class="table-responsive h-100">
                         <table class="table table-striped table-bordered table-hover">
                             <thead class="sticky-top">
                                 <tr>
@@ -111,6 +112,7 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             {% else %}
@@ -120,12 +122,13 @@
         {% if deck.sideboard|length > 0 %}
             <div class="tab-pane fade" id="sideboard-tab-pane" role="tabpanel" aria-labelledby="sideboard-tab" tabindex="0">
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-12 col-md-3">
                         <div class="sticky-top pt-3">
                             <img src="https://api.scryfall.com/cards/{{ deck.sideboard[0].card.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ deck.sideboard[0].card.name }}" id="sideboardCardImage">
                         </div>
                     </div>
-                    <div class="col-9">
+                    <div class="col-12 col-md-9 mt-4 mt-md-0">
+                        <div class="table-responsive h-100">
                         <table class="table table-striped table-bordered table-hover">
                             <thead class="sticky-top">
                                 <tr>
@@ -202,44 +205,45 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>
         {% endif %}
         <div class="tab-pane fade" id="lands-tab-pane" role="tabpanel" aria-labelledby="lands-tab" tabindex="0">
             <form action="{{ url_for('decks.deck', id=deck.id) }}" method="post">
-                <div class="row my-4">
-                    <div class="col">
+                <div class="row g-2 my-4">
+                    <div class="col-6 col-md">
                         <div class="form-floating">
                             <input type="number" class="form-control" id="plains" name="plains" placeholder="Plains" value="{{ deck.plains|default('', true) }}">
                             <label for="plains">Plains</label>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-6 col-md">
                         <div class="form-floating">
                             <input type="number" class="form-control" id="island" name="island" placeholder="Island" value="{{ deck.island|default('', true) }}">
                             <label for="island">Island</label>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-6 col-md">
                         <div class="form-floating">
                             <input type="number" class="form-control" id="swamp" name="swamp" placeholder="Swamp" value="{{ deck.swamp|default('', true) }}">
                             <label for="swamp">Swamp</label>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-6 col-md">
                         <div class="form-floating">
                             <input type="number" class="form-control" id="mountain" name="mountain" placeholder="Mountain" value="{{ deck.mountain|default('', true) }}">
                             <label for="mountain">Mountain</label>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-6 col-md">
                         <div class="form-floating">
                             <input type="number" class="form-control" id="forest" name="forest" placeholder="Forest" value="{{ deck.forest|default('', true) }}">
                             <label for="forest">Forest</label>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-6 col-md">
                         <button type="submit" class="btn btn-primary w-100 h-100">Save</button>
                     </div>
                 </div>

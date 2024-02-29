@@ -19,26 +19,28 @@
         </div>
     </form>
     <div class="row" id="dataBody" hidden>
-        <div class="col-3">
+        <div class="col-12 col-md-3">
             <div class="sticky-top pt-3">
                 <img class="img-fluid rounded-4" id="cardImage">
             </div>
         </div>
-        <div class="col-9">
-            <table class="table table-striped table-bordered table-hover mt-3">
-                <thead class="sticky-top">
-                    <tr>
-                        <th scope="col">Set ID</th>
-                        <th scope="col">Collector Number</th>
-                        <th scope="col">Rarity</th>
-                        <th scope="col">Regular Price</th>
-                        <th scope="col">Foil Price</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody class="align-middle" id="cardTableBody"></tbody>
-            </table>
+        <div class="col-12 col-md-9">
+            <div class="table-responsive h-100">
+                <table class="table table-striped table-bordered table-hover mt-3">
+                    <thead class="sticky-top">
+                        <tr>
+                            <th scope="col">Set ID</th>
+                            <th scope="col">Collector Number</th>
+                            <th scope="col">Rarity</th>
+                            <th scope="col">Regular Price</th>
+                            <th scope="col">Foil Price</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle" id="cardTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div id="dataLoading" hidden>

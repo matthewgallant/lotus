@@ -3,13 +3,13 @@
 {% block title %}Home{% endblock %}
 
 {% block main %}
-    <div class="d-flex justify-content-center align-items-center gap-5">
+    <div class="d-sm-flex justify-content-center align-items-center text-center gap-5">
         <div>
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Lotus Logo" class="img-fluid" style="height: 150px;">
         </div>
-        <div>
+        <div class="mt-4 mt-sm-0">
             <h1>Welcome to Lotus!</h1>
-            <p class="text-center">You have {{ "{:,}".format(collection_total) }} cards in your collection</p>
+            <p>You have {{ "{:,}".format(collection_total) }} cards in your collection</p>
             <div class="d-flex justify-content-center gap-2">
                 <a href="{{ url_for('search.search') }}" class="btn btn-primary">Search Collection</a>
                 <a href="{{ url_for('decks.decks') }}" class="btn btn-secondary">View Decks</a>
