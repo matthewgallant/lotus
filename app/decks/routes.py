@@ -173,6 +173,6 @@ def delete_deck(deck_id):
     # Delete deck
     deck = db.get_or_404(Deck, deck_id)
     db.session.delete(deck)
-
     db.session.commit()
+    
     return redirect(url_for('decks.decks', message=f"{deck.name} has been deleted"))
