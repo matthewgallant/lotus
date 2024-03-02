@@ -42,6 +42,10 @@ def deck(id):
     deck = db.get_or_404(Deck, id)
 
     if request.method == 'GET':
+        warning = None
+        card_names = []
+        duplicates = []
+
         binders = {
             "legendary": {
                 "mythic": [],
@@ -102,6 +106,16 @@ def deck(id):
         for assoc in deck.mainboard:
             card = assoc.card
 
+            # Check for duplicated
+            if card.name not in card_names:
+                card_names.append(card.name)
+            else:
+                duplicates.append(card.name)
+            
+            if len(duplicates) > 0:
+                warning = f"There might be duplicates of the following: {', '.join(duplicates)}"
+
+            # Sort cards for gathering
             if "legendary creature" in card.type_line.lower() or (card.text is not None and "be your commander" in card.text): # Commanders
                 binders["legendary"][card.rarity].append(card)
             elif "land" in card.type_line.lower(): # Lands
@@ -121,7 +135,7 @@ def deck(id):
             elif len(card.color_identity) > 1: # Multi
                 binders["multi"][card.rarity].append(card)
             
-        return render_template("decks/deck.html", deck=deck, binders=binders)
+        return render_template("decks/deck.html", deck=deck, binders=binders, warning=warning)
     else:
         deck.plains = request.form.get('plains')
         deck.island = request.form.get('island')

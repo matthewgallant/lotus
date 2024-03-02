@@ -4,7 +4,9 @@
 
 {% block main %}
     <h1 class="d-flex align-items-center mb-4">{{ deck.name }} <span class="badge bg-secondary ms-4 js-priceBadge">Loading Price...</span></h1>
-    {% if request.args.message %}
+    {% if warning %}
+        <div class="alert alert-warning mt-4" role="alert">{{ warning }}</div>
+    {% elif request.args.message %}
         <div class="alert alert-success mt-4" role="alert">{{ request.args.message }}</div>
     {% endif %}
     <ul class="nav nav-tabs" id="myTab" role="tablist">
