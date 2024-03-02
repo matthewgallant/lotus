@@ -10,6 +10,18 @@ from app.models.card import Card
 @bp.route("/")
 def decks():
     decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
+    
+    # Get color identity
+    for deck in decks:
+        color_identity = []
+        for assoc in deck.mainboard:
+            if assoc.card.color_identity:
+                colors = assoc.card.color_identity.split(',')
+                for color in colors:
+                    if color not in color_identity:
+                        color_identity.append(color)
+        deck.color_identity = color_identity
+    
     return render_template("decks/decks.html", decks=decks)
 
 @bp.route("/add", methods=['GET', 'POST'])
@@ -28,8 +40,88 @@ def add_deck():
 @bp.route('/<id>', methods=['GET', 'POST'])
 def deck(id):
     deck = db.get_or_404(Deck, id)
+
     if request.method == 'GET':
-        return render_template("decks/deck.html", deck=deck)
+        binders = {
+            "legendary": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            },
+            "white": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            },
+            "blue": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            },
+            "black": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            },
+            "red": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            },
+            "green": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            },
+            "multi": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            },
+            "colorless": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            },
+            "lands": {
+                "mythic": [],
+                "rare": [],
+                "uncommon": [],
+                "common": []
+            }
+        }
+            
+        for assoc in deck.mainboard:
+            card = assoc.card
+
+            if "legendary creature" in card.type_line.lower() or (card.text is not None and "be your commander" in card.text): # Commanders
+                binders["legendary"][card.rarity].append(card)
+            elif "land" in card.type_line.lower(): # Lands
+                binders["lands"][card.rarity].append(card)
+            elif card.color_identity == None: # Colorless
+                binders["colorless"][card.rarity].append(card)
+            elif card.color_identity == 'W': # White
+                binders["white"][card.rarity].append(card)
+            elif card.color_identity == 'U': # Blue
+                binders["blue"][card.rarity].append(card)
+            elif card.color_identity == 'B': # Black
+                binders["black"][card.rarity].append(card)
+            elif card.color_identity == 'R': # Red
+                binders["red"][card.rarity].append(card)
+            elif card.color_identity == 'G': # Green
+                binders["green"][card.rarity].append(card)
+            elif len(card.color_identity) > 1: # Multi
+                binders["multi"][card.rarity].append(card)
+            
+        return render_template("decks/deck.html", deck=deck, binders=binders)
     else:
         deck.plains = request.form.get('plains')
         deck.island = request.form.get('island')
@@ -38,90 +130,16 @@ def deck(id):
         deck.forest = request.form.get('forest')
         db.session.commit()
         return redirect(url_for('decks.deck', id=deck.id, message='Basic lands have been updated for this deck'))
-    
-@bp.route('/<id>/gather')
-def gather_deck(id):
+
+@bp.route('/<id>/rename', methods=['POST'])
+def rename_deck(id):
     deck = db.get_or_404(Deck, id)
-    binders = {
-        "legendary": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        },
-        "white": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        },
-        "blue": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        },
-        "black": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        },
-        "red": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        },
-        "green": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        },
-        "multi": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        },
-        "colorless": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        },
-        "lands": {
-            "mythic": [],
-            "rare": [],
-            "uncommon": [],
-            "common": []
-        }
-    }
-
-    for assoc in deck.mainboard:
-        card = assoc.card
-
-        if "legendary creature" in card.type_line.lower() or (card.text is not None and "be your commander" in card.text): # Commanders
-            binders["legendary"][card.rarity].append(card)
-        elif "land" in card.type_line.lower(): # Lands
-            binders["lands"][card.rarity].append(card)
-        elif card.color_identity == None: # Colorless
-            binders["colorless"][card.rarity].append(card)
-        elif card.color_identity == 'W': # White
-            binders["white"][card.rarity].append(card)
-        elif card.color_identity == 'U': # Blue
-            binders["blue"][card.rarity].append(card)
-        elif card.color_identity == 'B': # Black
-            binders["black"][card.rarity].append(card)
-        elif card.color_identity == 'R': # Red
-            binders["red"][card.rarity].append(card)
-        elif card.color_identity == 'G': # Green
-            binders["green"][card.rarity].append(card)
-        elif len(card.color_identity) > 1: # Multi
-            binders["multi"][card.rarity].append(card)
-        
-    return render_template("decks/gather.html", deck=deck, binders=binders)
+    
+    if request.form.get("name"):
+        deck.name = request.form.get("name")
+        db.session.commit()
+    
+    return redirect(url_for('decks.deck', id=deck.id, message='Deck name has been updated'))
 
 @bp.route('/<deck_id>/card/<card_id>/add/<board>')
 def add_card_to_deck(deck_id, card_id, board):

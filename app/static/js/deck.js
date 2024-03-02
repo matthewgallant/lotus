@@ -8,13 +8,16 @@ class DeckPage {
         this.priceBadgeEl = document.querySelector('.js-priceBadge');
         this.mainboardRows = document.querySelectorAll('#mainboard-tab-pane [data-scryfall-id]');
         this.sideboardRows = document.querySelectorAll('#sideboard-tab-pane [data-scryfall-id]');
+        this.gatherRows = document.querySelectorAll('#gather-tab-pane [data-scryfall-id]');
         this.mainboardCardImageEl = document.querySelector('#mainboardCardImage');
         this.sideboardCardImageEl = document.querySelector('#sideboardCardImage');
+        this.gatherCardImageEl = document.querySelector('#gatherCardImage');
 
         this.utilities = new Utilities();
 
         this.utilities.enableDynamicCardImages(this.mainboardRows, this.mainboardCardImageEl);
         this.utilities.enableDynamicCardImages(this.sideboardRows, this.sideboardCardImageEl);
+        this.utilities.enableDynamicCardImages(this.gatherRows, this.gatherCardImageEl);
         this.getPricingData();
     }
 
