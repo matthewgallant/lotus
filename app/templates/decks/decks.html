@@ -15,6 +15,7 @@
             <thead>
                 <tr>
                     <th scope="col">Name</th>
+                    <th scope="col">Color Identity</th>
                     <th scope="col">Mainboard</th>
                     <th scope="col">Sideboard</th>
                 </tr>
@@ -23,12 +24,34 @@
                 {% for deck in decks %}
                     <tr>
                         <td><a href="{{ url_for('decks.deck', id=deck.id) }}">{{ deck.name }}</a></td>
+                        <td>
+                            {% if deck.color_identity %}
+                                <div class="d-flex gap-1">
+                                    {% for color in deck.color_identity %}
+                                        {% if color == 'W' %}
+                                            <span class="color-icon color-icon-white"></span>
+                                        {% elif color == 'U' %}
+                                            <span class="color-icon color-icon-blue"></span>
+                                        {% elif color == 'B' %}
+                                            <span class="color-icon color-icon-black"></span>
+                                        {% elif color == 'R' %}
+                                            <span class="color-icon color-icon-red"></span>
+                                        {% elif color == 'G' %}
+                                            <span class="color-icon color-icon-green"></span>
+                                        {% elif color == 'UN' %}
+                                            <span class="color-icon color-icon-colorless"></span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </td>
                         <td>{{ deck.mainboard|length + deck.plains|default(0, true) + deck.island|default(0, true) + deck.swamp|default(0, true) + deck.mountain|default(0, true) + deck.forest|default(0, true) }}</td>
                         <td>{{ deck.sideboard|length }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}">
     {% else %}
         <p>No decks found. <a href="/decks/add">Add Your First One</a></p>
     {% endif %}
