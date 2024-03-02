@@ -11,3 +11,6 @@ class DeckCard(db.Model):
 
     deck = db.relationship('Deck')
     card = db.relationship('Card', back_populates='decks')
+
+    def __str__(self):
+        return f"{self.deck} -> {self.card}"

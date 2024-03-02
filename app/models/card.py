@@ -19,3 +19,6 @@ class Card(db.Model):
     text = db.Column(db.String)
 
     decks = db.relationship('DeckCard', back_populates='card')
+
+    def __str__(self):
+        return self.name

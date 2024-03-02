@@ -25,3 +25,6 @@ class Deck(db.Model):
         order_by='DeckCard.is_commander.desc()',
         primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board == 's')
     )
+
+    def __str__(self):
+        return self.name
