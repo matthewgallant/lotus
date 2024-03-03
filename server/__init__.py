@@ -16,7 +16,7 @@ def create_app(config_class=Config):
     db.init_app(server)
 
     # Register blueprints
-    server.register_blueprint(main_bp)
+    server.register_blueprint(main_bp, url_prefix='/api')
     server.register_blueprint(search_bp, url_prefix='/search')
     server.register_blueprint(decks_bp, url_prefix='/decks')
     server.register_blueprint(cards_bp, url_prefix='/cards')
