@@ -1,9 +1,9 @@
 from flask import render_template, redirect, request, url_for
-from app.search import bp
-from app.extensions import db
+from server.search import bp
+from server.extensions import db
 
 # Load models
-from app.models.card import Card
+from server.models.card import Card
 
 def handle_search():
     query = db.select(Card).group_by(Card.name)

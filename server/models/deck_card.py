@@ -1,4 +1,4 @@
-from app.extensions import db
+from server.extensions import db
 
 class DeckCard(db.Model):
     __tablename__ = "decks_cards"

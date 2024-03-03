@@ -1,5 +1,5 @@
-from app.extensions import db
-from app.models.deck_card import DeckCard
+from server.extensions import db
+from server.models.deck_card import DeckCard
 from sqlalchemy import and_
 
 class Deck(db.Model):

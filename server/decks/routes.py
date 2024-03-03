@@ -1,11 +1,11 @@
 from flask import render_template, redirect, request, url_for
-from app.decks import bp
-from app.extensions import db
+from server.decks import bp
+from server.extensions import db
 
 # Load models
-from app.models.deck_card import DeckCard
-from app.models.deck import Deck
-from app.models.card import Card
+from server.models.deck_card import DeckCard
+from server.models.deck import Deck
+from server.models.card import Card
 
 @bp.route("/")
 def decks():
