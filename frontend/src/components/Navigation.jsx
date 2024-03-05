@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef } from 'react';
+
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -7,6 +9,25 @@ import Button from 'react-bootstrap/Button';
 import logo from '../assets/images/logo.png';
 
 export default function Navigation() {
+    const searchRef = useRef(null)
+
+    // Handle the focus keyboard shortcut
+    const handleKeyPress = useCallback((event) => {
+        if (event.metaKey === true && event.key === '/') {
+            searchRef.current.focus();
+        }
+    }, []);
+    
+    useEffect(() => {
+        // attach the event listener
+        document.addEventListener('keydown', handleKeyPress);
+
+        // remove the event listener
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [handleKeyPress]);
+
     return (
         <Navbar collapseOnSelect expand="lg" className="bg-primary" data-bs-theme="dark">
             <Container>
@@ -28,8 +49,8 @@ export default function Navigation() {
                         <Nav.Link href="/cards/add">Add Cards</Nav.Link>
                         <Nav.Link href="/import">Import</Nav.Link>
                     </Nav>
-                    <Form inline className='d-flex gap-2'>
-                        <Form.Control type="text" placeholder="Search: &#8984; + /" />
+                    <Form inline="true" className='d-flex gap-2'>
+                        <Form.Control type="text" placeholder="Search: &#8984; + /" ref={searchRef} />
                         <Button type="submit" variant="outline-light">Search</Button>
                     </Form>
                 </Navbar.Collapse>
