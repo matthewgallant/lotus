@@ -6,7 +6,6 @@ from app.cards import bp
 from app.extensions import db
 
 # Load models
-from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 from app.models.card import Card
 
@@ -16,44 +15,12 @@ def card(id):
     cards = db.session.execute(db.select(Card).where(Card.name == card.name)).scalars().all()
     decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
     return render_template("cards/card.html", card=card, cards=cards, decks=decks)
-
-@bp.route('/<card_id>/delete')
-def delete_card(card_id):
-    # Delete card associations
-    db.session.execute(db.delete(DeckCard).where(DeckCard.card_id == card_id))
-
-    # Delete card
-    card = db.get_or_404(Card, card_id)
-    db.session.delete(card)
-
-    db.session.commit()
-    return render_template("cards/delete-card.html", message=f"{card.name} has been deleted")
-
-@bp.route('/<card_id>/quantity', methods=['POST'])
-def edit_card_quantity(card_id):
-    if request.form.get('quantity'):
-        card = db.get_or_404(Card, card_id)
-        card.quantity = request.form.get('quantity')
-        db.session.commit()
-        return redirect(url_for('cards.card', id=card_id, message=f"The quantity has been increased to {request.form.get('quantity')}"))
-    else:
-        return redirect(url_for('cards.card', id=card_id, error=f"A quantity is required to update"))
     
 @bp.route('/<card_id>/decks')
 def card_decks(card_id):
     card = db.get_or_404(Card, card_id)
     return render_template("cards/card-decks.html", card=card)
 
-@bp.route('/autocomplete', methods=['POST'])
-def autocomplete():
-    if request.form.get("query"):
-        cards = db.session.execute(
-            db.select(Card.name)
-                .where(Card.name.like(f'%{request.form.get("query")}%'))
-                .group_by(Card.name)
-            ).scalars().all()
-        return cards
-    
 @bp.route("/add")
 def add_card():
     return render_template("cards/add-card.html")
@@ -72,7 +39,7 @@ def add_card_from_scryfall(scryfall_id):
 
     if existing_card:
         existing_card.quantity += 1
-        message = f"{existing_card.name}'s quantity has been increased"
+        message = f"{existing_card.name}'s quantity has been increased."
     else:
         res = requests.get(f'https://api.scryfall.com/cards/{scryfall_id}')
         if res.status_code == 200:
@@ -127,11 +94,12 @@ def add_card_from_scryfall(scryfall_id):
                 text=text
             )
             db.session.add(new_card)
-            message = f"{name} has been added to your collection"
+            message = f"{name} has been added to your collection."
         else:
-            error = "An error has occured when trying to add the card"
+            error = "An error has occured when trying to add the card."
 
     db.session.commit()
+    
     return redirect(url_for('cards.add_card', message=message, error=error))
 
 @bp.route("/import", methods=['GET', 'POST'])
@@ -245,11 +213,11 @@ def import_cards():
                         error = True
                         errors.append(line)
         else:
-            error = "A card list is required to import"
+            error = "A card list is required to import."
 
         if not error:
             db.session.commit()
-            message = "Successfully imported all cards to collection"
+            message = "Successfully imported all cards to collection."
         elif error == True:
             error = "Unable to retrive the following cards from Scryfall. No cards have been imported."
         

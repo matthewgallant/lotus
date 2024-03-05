@@ -6,7 +6,8 @@
     <h1 class="d-flex align-items-center mb-4">{{ deck.name }} <span class="badge bg-secondary ms-4 js-priceBadge">Loading Price...</span></h1>
     {% if warning %}
         <div class="alert alert-warning mt-4" role="alert">{{ warning }}</div>
-    {% elif request.args.message %}
+    {% endif %}
+    {% if request.args.message %}
         <div class="alert alert-success mt-4" role="alert">{{ request.args.message }}</div>
     {% endif %}
     <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -94,21 +95,21 @@
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li>
-                                                            <a href="{{ url_for('decks.move_card_board', deck_id=deck.id, assoc_id=assoc.id, board='s') }}" class="dropdown-item">
+                                                            <button type="button" data-link="{{ url_for('api_decks.move_card_board') }}" data-assoc="{{ assoc.id }}" data-board="s" class="js-moveBoardButton dropdown-item">
                                                                 <i class="bi-arrow-right"></i> Sideboard
-                                                            </a>
+                                                            </button>
                                                             {% if assoc.is_commander %}
-                                                                <a href="{{ url_for('decks.unset_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                                <button type="button" data-link="{{ url_for('api_decks.set_commander_for_deck') }}" data-assoc="{{ assoc.id }}" data-type="unset" class="js-setCommanderButton dropdown-item">
                                                                     <i class="bi-person"></i> Unset Commander
-                                                                </a>
+                                                                </button>
                                                             {% else %}
-                                                                <a href="{{ url_for('decks.set_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                                <button type="button" data-link="{{ url_for('api_decks.set_commander_for_deck') }}" data-assoc="{{ assoc.id }}" data-type="set" class="js-setCommanderButton dropdown-item">
                                                                     <i class="bi-person-fill"></i> Set Commander
-                                                                </a>
+                                                                </button>
                                                             {% endif %}
-                                                            <a href="{{ url_for('decks.remove_card_from_deck', deck_id=deck.id, card_id=assoc.card.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                            <button type="button" data-link="{{ url_for('api_decks.remove_card_from_deck') }}" data-assoc="{{ assoc.id }}" class="js-deleteButton dropdown-item">
                                                                 <i class="bi-trash-fill"></i> Remove
-                                                            </a>
+                                                            </button>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -187,21 +188,21 @@
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li>
-                                                            <a href="{{ url_for('decks.move_card_board', deck_id=deck.id, assoc_id=assoc.id, board='m') }}" class="dropdown-item">
+                                                            <button type="button" data-link="{{ url_for('api_decks.move_card_board') }}" data-assoc="{{ assoc.id }}" data-board="m" class="js-moveBoardButton dropdown-item">
                                                                 <i class="bi-arrow-left"></i> Mainboard
-                                                            </a>
+                                                            </button>
                                                             {% if assoc.is_commander %}
-                                                                <a href="{{ url_for('decks.unset_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                                <button type="button" data-link="{{ url_for('api_decks.set_commander_for_deck') }}" data-assoc="{{ assoc.id }}" data-type="unset" class="js-setCommanderButton dropdown-item">
                                                                     <i class="bi-person"></i> Unset Commander
                                                                 </a>
                                                             {% else %}
-                                                                <a href="{{ url_for('decks.set_commander_for_deck', deck_id=deck.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                                <button type="button" data-link="{{ url_for('api_decks.set_commander_for_deck') }}" data-assoc="{{ assoc.id }}" data-type="set" class="js-setCommanderButton dropdown-item">
                                                                     <i class="bi-person-fill"></i> Set Commander
-                                                                </a>
+                                                                </button>
                                                             {% endif %}
-                                                            <a href="{{ url_for('decks.remove_card_from_deck', deck_id=deck.id, card_id=assoc.card.id, assoc_id=assoc.id) }}" class="dropdown-item">
+                                                            <button type="button" data-link="{{ url_for('api_decks.remove_card_from_deck') }}" data-assoc="{{ assoc.id }}" class="js-deleteButton dropdown-item">
                                                                 <i class="bi-trash-fill"></i> Remove
-                                                            </a>
+                                                            </button>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -335,6 +336,7 @@
             </div>
         </div>
     </div>
+    {% include "components/toast.html" %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}">
     <script src="{{ url_for('static', filename='js/deck.js') }}"></script>
 {% endblock %}

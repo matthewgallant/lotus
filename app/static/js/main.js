@@ -46,6 +46,29 @@ class Utilities {
 
         return totalPrice;
     }
+
+    async postDataToAPI(endpoint, body, errorToastBody, errorToast, successToastBody, successToast) {
+        const options = {
+            method: "POST",
+            body: body
+        }
+
+        const res = await fetch(endpoint, options);
+        const data = await res.json();
+
+        const success = data?.success;
+        const error = data?.error;
+
+        if (error) {
+            errorToastBody.innerText = error;
+            errorToast.show();
+            return false;
+        } else if (success) {
+            successToastBody.innerHTML = success;
+            successToast.show();
+            return true;
+        }
+    }
 }
 
 class Navbar {
@@ -70,7 +93,7 @@ class Navbar {
             if (this.searchInput.value.length > 2) {
                 const form = new FormData();
                 form.append("query", this.searchInput.value);
-                fetch("/cards/autocomplete", { method: 'POST', body: form })
+                fetch("/api/cards/autocomplete", { method: 'POST', body: form })
                     .then(res => res.json())
                     .then(data => {
                         this.dataList.innerHTML = '';
