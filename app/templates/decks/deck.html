@@ -271,14 +271,14 @@
                                     <thead class="sticky-top">
                                         <tr>
                                             <th scope="col">Name</th>
+                                            <th scope="col">Available</th>
                                             <th scope="col">Set ID</th>
                                             <th scope="col">Foil</th>
-                                            <th scope="col">Decks</th>
                                         </tr>
                                     </thead>
                                     <tbody class="align-middle">
                                         {% for card in cards %}
-                                            <tr data-scryfall-id="{{ card.scryfall_id }}">
+                                            <tr data-scryfall-id="{{ card.scryfall_id }}" class="{{ 'table-danger' if card.decks|length >= card.quantity + 1 else 'table-success' }}">
                                                 <td>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="{{ card.id }}">
@@ -290,11 +290,11 @@
                                                         </label>
                                                     </div>
                                                 </td>
+                                                <td>
+                                                    <a href="{{ url_for('cards.card_decks', card_id=card.id) }}" target="_blank">{{ card.quantity - card.decks|length + 1 }}</a>
+                                                </td>
                                                 <td>{{ card.set_id }}</td>
                                                 <td class="text-capitalize js-foil">{{ card.foil|default('regular', 'true') }}</td>
-                                                <td>
-                                                    <a href="{{ url_for('cards.card_decks', card_id=card.id) }}" target="_blank">Decks</a>
-                                                </td>
                                         {% endfor %}
                                     </tbody>
                                 </table>
