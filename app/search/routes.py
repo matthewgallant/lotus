@@ -1,12 +1,14 @@
 from flask import render_template, redirect, request, url_for
 from app.search import bp
 from app.extensions import db
+from sqlalchemy import func
 
 # Load models
 from app.models.card import Card
 
 def handle_search():
-    query = db.select(Card)
+    unique_named_cards = db.select(func.min(Card.id)).group_by(Card.name).subquery()
+    query = db.select(Card).where(Card.id.in_(unique_named_cards))
 
     if request.args.get('name'):
         query = query.where(Card.name.like(f'%{request.args.get("name")}%'))
