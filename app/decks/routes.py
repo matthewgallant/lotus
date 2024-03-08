@@ -123,11 +123,17 @@ def deck(id):
             
         return render_template("decks/deck.html", deck=deck, binders=binders, warning=warning)
     else:
-        deck.plains = request.form.get('plains')
-        deck.island = request.form.get('island')
-        deck.swamp = request.form.get('swamp')
-        deck.mountain = request.form.get('mountain')
-        deck.forest = request.form.get('forest')
+        if request.form.get('plains'):
+            deck.plains = int(request.form.get('plains'))
+        if request.form.get('island'):
+            deck.island = int(request.form.get('island'))
+        if request.form.get('swamp'):
+            deck.swamp = int(request.form.get('swamp'))
+        if request.form.get('mountain'):
+            deck.mountain = int(request.form.get('mountain'))
+        if request.form.get('forest'):
+            deck.forest = int(request.form.get('forest'))
+        
         db.session.commit()
         return redirect(url_for('decks.deck', id=deck.id, message='Basic lands have been updated for this deck.'))
 

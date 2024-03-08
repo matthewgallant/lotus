@@ -6,7 +6,7 @@ from app.extensions import db
 from app.models.card import Card
 
 def handle_search():
-    query = db.select(Card).group_by(Card.name)
+    query = db.select(Card)
 
     if request.args.get('name'):
         query = query.where(Card.name.like(f'%{request.args.get("name")}%'))

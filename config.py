@@ -1,8 +1,11 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Config:
     LOTUS_ENVIRONMENT = os.environ.get('LOTUS_ENVIRONMENT')
     if LOTUS_ENVIRONMENT == 'prod':
-        SQLALCHEMY_DATABASE_URI = "sqlite:////database/collection.db"
+        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI_PROD')
     else:
-        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')
+        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI_DEV')

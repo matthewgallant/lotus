@@ -6,7 +6,7 @@ class Deck(db.Model):
     __tablename__ = "decks"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(250), nullable=False)
     plains = db.Column(db.Integer)
     island = db.Column(db.Integer)
     swamp = db.Column(db.Integer)
