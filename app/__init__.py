@@ -17,6 +17,10 @@ def create_app(config_class=Config):
     # Initialize database
     db.init_app(app)
 
+    # Create tables if needed
+    with app.app_context():
+        db.create_all()
+
     # Register blueprints
     app.register_blueprint(main_bp)
     app.register_blueprint(search_bp, url_prefix='/search')

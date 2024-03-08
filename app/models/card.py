@@ -16,7 +16,7 @@ class Card(db.Model):
     power = db.Column(db.String(10))
     toughness = db.Column(db.String(10))
     rarity = db.Column(db.String(10))
-    text = db.Column(db.String)
+    text = db.Column(db.String(500))
 
     decks = db.relationship('DeckCard', back_populates='card')
 
