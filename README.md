@@ -16,7 +16,7 @@ flask run --debug
 
 A `Dockerfile` is included to run the app in Docker. The following will run the app on port 5000. You'll need to place your SQLite database in that folder named `collection.db`.
 
-**Note:** This is not a truly production-ready server. It should be fine for a local application but to truly deploy this application you should consider using [Gunicorn](https://gunicorn.org). There is also no account suppport for the application so anyone on the network can access your application instance. Consider using something like [Nginx Basic Authentication](https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/) to lock down the app with a username and password.
+**Note:** There is no account suppport for the application. This means that anyone on the network can access your application instance. Consider using something like [Nginx Basic Authentication](https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/) to protect your app instance with a username and password.
 
 ```bash
 docker build --tag lotus .
