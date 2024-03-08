@@ -24,23 +24,41 @@ class Utilities {
 
     async livePriceLoading(rows) {
         let totalPrice = 0;
+        const rowsArray = Array.from(rows);
+        
+        for (let i = 0; i < rowsArray.length; i += 75) {
+            const chunk = rowsArray.slice(i, i + 75);
+            const ids = chunk.map(row => ({ id: row.dataset.scryfallId }));
 
-        for (const row of rows) {
-            await fetch(`https://api.scryfall.com/cards/${row.dataset.scryfallId}`)
+            const options = {
+                method: "POST",
+                body: JSON.stringify({
+                    identifiers: ids
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                } 
+            }
+            
+            await fetch(`https://api.scryfall.com/cards/collection`, options)
                 .then(res => res.json())
                 .then(data => {
-                    const priceEl = row.querySelector('.js-price');
-                    const foilEl = row.querySelector('.js-foil');
-                    if (foilEl.innerText.toLowerCase() === 'regular' && data.prices.usd) {
-                        totalPrice += parseFloat(data['prices']['usd']);
-                        priceEl.innerText = `$${data['prices']['usd']}`;
-                    } else if (data?.prices?.usd_foil) {
-                        totalPrice += parseFloat(data['prices']['usd_foil']);
-                        priceEl.innerText = `$${data['prices']['usd_foil']}`;
-                    } else if (data?.prices?.usd_etched) {
-                        totalPrice += parseFloat(data['prices']['usd_etched']);
-                        priceEl.innerText = `$${data['prices']['usd_etched']}`;
-                    }
+                    data?.data.forEach(card => {
+                        const row = rowsArray.find(row => row.dataset.scryfallId === card.id);
+                        const priceEl = row.querySelector('.js-price');
+                        const foilEl = row.querySelector('.js-foil');
+
+                        if (foilEl.innerText.toLowerCase() === 'regular' && card.prices.usd) {
+                            totalPrice += parseFloat(card['prices']['usd']);
+                            priceEl.innerText = `$${card['prices']['usd']}`;
+                        } else if (card?.prices?.usd_foil) {
+                            totalPrice += parseFloat(card['prices']['usd_foil']);
+                            priceEl.innerText = `$${card['prices']['usd_foil']}`;
+                        } else if (card?.prices?.usd_etched) {
+                            totalPrice += parseFloat(card['prices']['usd_etched']);
+                            priceEl.innerText = `$${card['prices']['usd_etched']}`;
+                        }
+                    });
                 });
         }
 
