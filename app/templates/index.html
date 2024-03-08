@@ -9,7 +9,8 @@
         </div>
         <div class="mt-4 mt-sm-0">
             <h1>Welcome to Lotus!</h1>
-            <p>You have {{ "{:,}".format(collection_total) }} cards in your collection</p>
+            <p class="mb-1">You have {{ "{:,}".format(collection_total) }} cards in your collection.</p>
+            <p>{{ "{:,}".format(unique_total) }} of those are unique cards.</p>
             <div class="d-flex justify-content-center gap-2">
                 <a href="{{ url_for('search.search') }}" class="btn btn-primary">Search Collection</a>
                 <a href="{{ url_for('decks.decks') }}" class="btn btn-secondary">View Decks</a>
