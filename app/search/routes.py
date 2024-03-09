@@ -31,6 +31,20 @@ def handle_search():
                     query = query.where(Card.color_identity.contains(color))
                 else:
                     query = query.where(Card.color_identity.notlike(f'%{color}%'))
+    if request.args.get('cmc') and request.args.get('cmcType'):
+        cmc = request.args.get('cmc')
+        cmcType = request.args.get('cmcType')
+
+        if cmcType == 'lessThan':
+            query = query.where(Card.cmc < cmc)
+        elif cmcType == 'lessThanEqualTo':
+            query = query.where(Card.cmc <= cmc)
+        elif cmcType == 'equalTo':
+            query = query.where(Card.cmc == cmc)
+        elif cmcType == 'greaterThanEqualTo':
+            query = query.where(Card.cmc >= cmc)
+        elif cmcType == 'greaterThan':
+            query = query.where(Card.cmc > cmc)
     
     return db.paginate(query, per_page=12)
 
@@ -57,6 +71,9 @@ def results():
             params['rarity'] = request.form.get('rarity')
         if len(request.form.getlist('color')) > 0:
             params['color'] = ",".join(request.form.getlist("color"))
+        if request.form.get('cmc') and request.form.get('cmcType'):
+            params['cmc'] = int(request.form.get('cmc'))
+            params['cmcType'] = request.form.get('cmcType')
         
         # Redirect to GET url
         return redirect(url_for('search.results', **params))

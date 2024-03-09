@@ -47,6 +47,17 @@
                 <option value="common">Common</option>
             </select>
         </div>
+        <div class="input-group mb-3">
+            <label for="cmcTypeSelect" class="input-group-text">CMC</label>
+            <select class="form-select" aria-label="CMC Type" name="cmcType" id="cmcTypeSelect">
+                <option value="lessThan">&lt;</option>
+                <option value="lessThanEqualTo">&lt;=</option>
+                <option value="equalTo">=</option>
+                <option value="greaterThanEqualTo">&gt;=</option>
+                <option value="greaterThan">&gt;</option>
+            </select>
+            <input class="form-control" id="cmcInput" name="cmc" placeholder="Enter a CMC...">
+        </div>
         <div class="mb-3">
             <div class="form-check mb-1">
                 <input class="form-check-input" type="checkbox" value="w" id="whiteColor" name="color">
