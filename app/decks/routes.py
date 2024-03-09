@@ -102,9 +102,9 @@ def deck(id):
                 warning = f"There might be duplicates of the following: {', '.join(duplicates)}."
 
             # Sort cards for gathering
-            if "legendary creature" in card.type_line.lower() or (card.text is not None and "be your commander" in card.text): # Commanders
+            if ("legendary" in card.type_line.lower() and "creature" in card.type_line.lower()) or (card.text is not None and "be your commander" in card.text): # Commanders
                 binders["legendary"][card.rarity].append(card)
-            elif "land" in card.type_line.lower(): # Lands
+            elif card.type_line.lower() == "land": # Lands
                 binders["lands"][card.rarity].append(card)
             elif card.color_identity == None: # Colorless
                 binders["colorless"][card.rarity].append(card)
@@ -118,7 +118,7 @@ def deck(id):
                 binders["red"][card.rarity].append(card)
             elif card.color_identity == 'G': # Green
                 binders["green"][card.rarity].append(card)
-            elif len(card.color_identity) > 1: # Multi
+            elif card.color_identity: # Multi
                 binders["multi"][card.rarity].append(card)
             
         return render_template("decks/deck.html", deck=deck, binders=binders, warning=warning)
