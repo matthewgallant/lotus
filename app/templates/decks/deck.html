@@ -67,8 +67,8 @@
                                             <td class="text-capitalize">{{ assoc.card.rarity|default('N/A', 'true') }}</td>
                                             <td class="text-capitalize js-foil">{{ assoc.card.foil|default('regular', 'true') }}</td>
                                             <td>
-                                                {% if assoc.card.color_identity %}
-                                                    <div class="d-flex gap-1">
+                                                <div class="d-flex gap-1">
+                                                    {% if assoc.card.color_identity %}
                                                         {% for color in assoc.card.color_identity.split(',') %}
                                                             {% if color == 'W' %}
                                                                 <span class="color-icon color-icon-white"></span>
@@ -80,12 +80,12 @@
                                                                 <span class="color-icon color-icon-red"></span>
                                                             {% elif color == 'G' %}
                                                                 <span class="color-icon color-icon-green"></span>
-                                                            {% elif color == 'UN' %}
-                                                                <span class="color-icon color-icon-colorless"></span>
                                                             {% endif %}
                                                         {% endfor %}
-                                                    </div>
-                                                {% endif %}
+                                                    {% else %}
+                                                        <span class="color-icon color-icon-colorless"></span>
+                                                    {% endif %}
+                                                </div>
                                             </td>
                                             <td class="js-price">Loading...</td>
                                             <td class="text-center">
@@ -160,8 +160,8 @@
                                             <td class="text-capitalize">{{ assoc.card.rarity|default('N/A', 'true') }}</td>
                                             <td class="text-capitalize js-foil">{{ assoc.card.foil|default('regular', 'true') }}</td>
                                             <td>
-                                                {% if assoc.card.color_identity %}
-                                                    <div class="d-flex gap-1">
+                                                <div class="d-flex gap-1">
+                                                    {% if assoc.card.color_identity %}
                                                         {% for color in assoc.card.color_identity.split(',') %}
                                                             {% if color == 'W' %}
                                                                 <span class="color-icon color-icon-white"></span>
@@ -173,12 +173,12 @@
                                                                 <span class="color-icon color-icon-red"></span>
                                                             {% elif color == 'G' %}
                                                                 <span class="color-icon color-icon-green"></span>
-                                                            {% elif color == 'UN' %}
-                                                                <span class="color-icon color-icon-colorless"></span>
                                                             {% endif %}
                                                         {% endfor %}
-                                                    </div>
-                                                {% endif %}
+                                                    {% else %}
+                                                        <span class="color-icon color-icon-colorless"></span>
+                                                    {% endif %}
+                                                </div>
                                             </td>
                                             <td class="js-price">Loading...</td>
                                             <td class="text-center">
