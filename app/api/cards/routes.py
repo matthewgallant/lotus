@@ -1,12 +1,14 @@
 from flask import request
+from flask_login import login_required
+
 from app.api.cards import bp
 from app.extensions import db
 
-# Load models
 from app.models.deck_card import DeckCard
 from app.models.card import Card
 
 @bp.route('/autocomplete', methods=['POST'])
+@login_required
 def autocomplete():
     if request.form.get("query"):
         cards = db.session.execute(
@@ -17,6 +19,7 @@ def autocomplete():
         return cards
 
 @bp.route('/<card_id>/quantity', methods=['POST'])
+@login_required
 def edit_card_quantity(card_id):
     if request.form.get('quantity'):
         card = db.get_or_404(Card, card_id)
@@ -29,6 +32,7 @@ def edit_card_quantity(card_id):
         return { "error": "A quantity if required to update." }
 
 @bp.route('/delete', methods=['POST'])
+@login_required
 def delete_card():
     if request.form.get("card_id"):
         card_id = request.form.get("card_id")

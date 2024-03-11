@@ -1,13 +1,15 @@
 from flask import request
+from flask_login import login_required
+
 from app.api.decks import bp
 from app.extensions import db
 
-# Load models
 from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 from app.models.card import Card
 
 @bp.route('/<deck_id>/add', methods=['POST'])
+@login_required
 def add_card_to_deck(deck_id):
     if request.form.get("card_id") and request.form.get("board"):
         card_id = request.form.get("card_id")
@@ -32,6 +34,7 @@ def add_card_to_deck(deck_id):
         return { "error": "An error occured while trying to add the card to the deck." }
 
 @bp.route('/card/move', methods=['POST'])
+@login_required
 def move_card_board():
     if request.form.get("assoc_id") and request.form.get("board"):
         assoc_id = request.form.get("assoc_id")
@@ -47,6 +50,7 @@ def move_card_board():
         return { "error": "An error occured while moving the card's board." }
     
 @bp.route('/card/commander', methods=['POST'])
+@login_required
 def set_commander_for_deck():
     if request.form.get("assoc_id") and request.form.get("set_commander"):
         assoc_id = request.form.get("assoc_id")
@@ -65,6 +69,7 @@ def set_commander_for_deck():
         return { "error": "An error occured while trying to change the commander status." }
 
 @bp.route('/card/remove', methods=['POST'])
+@login_required
 def remove_card_from_deck():
     if request.form.get("assoc_id"):
         assoc_id = request.form.get("assoc_id")

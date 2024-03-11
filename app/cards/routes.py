@@ -2,14 +2,16 @@ import json
 import requests
 
 from flask import render_template, redirect, request, url_for
+from flask_login import login_required
+
 from app.cards import bp
 from app.extensions import db
 
-# Load models
 from app.models.deck import Deck
 from app.models.card import Card
 
 @bp.route("/<id>")
+@login_required
 def card(id):
     card = db.get_or_404(Card, id)
     cards = db.session.execute(db.select(Card).where(Card.name == card.name)).scalars().all()
@@ -17,15 +19,18 @@ def card(id):
     return render_template("cards/card.html", card=card, cards=cards, decks=decks)
     
 @bp.route('/<card_id>/decks')
+@login_required
 def card_decks(card_id):
     card = db.get_or_404(Card, card_id)
     return render_template("cards/card-decks.html", card=card)
 
 @bp.route("/add")
+@login_required
 def add_card():
     return render_template("cards/add-card.html")
     
 @bp.route("/add/<scryfall_id>")
+@login_required
 def add_card_from_scryfall(scryfall_id):
     message = None
     error = None
@@ -103,6 +108,7 @@ def add_card_from_scryfall(scryfall_id):
     return redirect(url_for('cards.add_card', message=message, error=error))
 
 @bp.route("/import", methods=['GET', 'POST'])
+@login_required
 def import_cards():
     if request.method == 'GET':
         return render_template("cards/import.html")

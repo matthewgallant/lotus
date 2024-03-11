@@ -1,9 +1,10 @@
 from flask import render_template, redirect, request, url_for
-from app.search import bp
-from app.extensions import db
+from flask_login import login_required
 from sqlalchemy import func
 
-# Load models
+from app.search import bp
+from app.extensions import db
+
 from app.models.card import Card
 
 def handle_search():
@@ -49,11 +50,13 @@ def handle_search():
     return db.paginate(query, per_page=12)
 
 @bp.route("/")
+@login_required
 def search():
     sets = db.session.execute(db.select(Card.set_id).group_by(Card.set_id))
     return render_template("search/search.html", sets=sets)
 
 @bp.route("/results", methods=['GET', 'POST'])
+@login_required
 def results():
     if request.method == 'POST':
         params = {}
@@ -87,6 +90,7 @@ def results():
             return render_template("search/results.html", cards=cards)
         
 @bp.route("/api/cards")
+@login_required
 def api_cards():
     cards = handle_search()
     return render_template("search/api/cards.html", cards=cards)

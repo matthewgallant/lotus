@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block main %}
+    <div class="d-flex justify-content-center">
+        <div class="login">
+            <div class="text-center">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Lotus Logo" class="img-fluid logo">
+                <h1 class="my-4">Lotus</h1>
+            </div>
+            <h2 class="mb-3">Register</h2>
+            <p>Already have an account? <a href="{{ url_for('account.login') }}">Login Here</a></p>
+            {% if error %}
+                <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% endif %}
+            <form action="{{ url_for('account.register') }}" method="post">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name..." required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email Address..." required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" aria-describedby="passwordHelp" placeholder="Enter Password..." required>
+                    <div id="passwordHelp" class="form-text">
+                        Your password must have the following:
+                        <ul>
+                            <li>Be at least 10 characters long</li>
+                            <li>Have at least 1 number</li>
+                            <li>Have at least 1 lowercase character</li>
+                            <li>Have at least 1 uppercase character</li>
+                            <li>Have at least 1 special symbol (!, #, $, %, &, *, <, >, ?, @)</li>
+                        </ul>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

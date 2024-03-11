@@ -3,9 +3,12 @@
 {% block title %}Home{% endblock %}
 
 {% block main %}
+    {% if request.args.message %}
+        <div class="alert alert-success mb-5" role="alert">{{ request.args.message }}</div>
+    {% endif %}
     <div class="d-sm-flex justify-content-center align-items-center text-center gap-5">
         <div>
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Lotus Logo" class="img-fluid" style="height: 150px;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Lotus Logo" class="img-fluid logo">
         </div>
         <div class="mt-4 mt-sm-0">
             <h1>Welcome to Lotus!</h1>

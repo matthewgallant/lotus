@@ -107,24 +107,26 @@ class Navbar {
     }
 
     setupInputListener() {
-        this.searchInput.addEventListener('input', () => {
-            if (this.searchInput.value.length > 2) {
-                const form = new FormData();
-                form.append("query", this.searchInput.value);
-                fetch("/api/cards/autocomplete", { method: 'POST', body: form })
-                    .then(res => res.json())
-                    .then(data => {
-                        this.dataList.innerHTML = '';
-                        if (data.length > 0) {
-                            data.forEach(cardName => {
-                                const option = document.createElement('option');
-                                option.value = cardName;
-                                this.dataList.appendChild(option);
-                            });
-                        }
-                    });
-            }
-        });
+        if (this.searchInput) {
+            this.searchInput.addEventListener('input', () => {
+                if (this.searchInput.value.length > 2) {
+                    const form = new FormData();
+                    form.append("query", this.searchInput.value);
+                    fetch("/api/cards/autocomplete", { method: 'POST', body: form })
+                        .then(res => res.json())
+                        .then(data => {
+                            this.dataList.innerHTML = '';
+                            if (data.length > 0) {
+                                data.forEach(cardName => {
+                                    const option = document.createElement('option');
+                                    option.value = cardName;
+                                    this.dataList.appendChild(option);
+                                });
+                            }
+                        });
+                }
+            });
+        }
     }
 }
 

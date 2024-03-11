@@ -1,12 +1,14 @@
 from flask import render_template, redirect, request, url_for
+from flask_login import login_required
+
 from app.decks import bp
 from app.extensions import db
 
-# Load models
 from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 
 @bp.route("/")
+@login_required
 def decks():
     decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
     
@@ -24,6 +26,7 @@ def decks():
     return render_template("decks/decks.html", decks=decks)
         
 @bp.route('/<id>', methods=['GET', 'POST'])
+@login_required
 def deck(id):
     deck = db.get_or_404(Deck, id)
 
@@ -138,6 +141,7 @@ def deck(id):
         return redirect(url_for('decks.deck', id=deck.id, message='Basic lands have been updated for this deck.'))
 
 @bp.route("/add", methods=['GET', 'POST'])
+@login_required
 def add_deck():
     if request.method == 'GET':
         return render_template("decks/add-deck.html")
@@ -151,6 +155,7 @@ def add_deck():
             return render_template("decks/add-deck.html", error='A deck name is required!.')
 
 @bp.route('/<id>/rename', methods=['POST'])
+@login_required
 def rename_deck(id):
     deck = db.get_or_404(Deck, id)
     
@@ -161,6 +166,7 @@ def rename_deck(id):
     return redirect(url_for('decks.deck', id=deck.id, message='Deck name has been updated.'))
 
 @bp.route('/<deck_id>/delete')
+@login_required
 def delete_deck(deck_id):
     # Delete card associations
     db.session.execute(db.delete(DeckCard).where(DeckCard.deck_id == deck_id))

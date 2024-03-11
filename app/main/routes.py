@@ -1,12 +1,14 @@
 from flask import render_template
-from app.main import bp
-from app.extensions import db
+from flask_login import login_required
 from sqlalchemy import func
 
-# Load models
+from app.main import bp
+from app.extensions import db
+
 from app.models.card import Card
 
 @bp.route('/')
+@login_required
 def index():
     collection_total = db.session.query(func.sum(Card.quantity)).scalar()
     

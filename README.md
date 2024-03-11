@@ -28,12 +28,15 @@ docker run --name lotus-mysql -e MYSQL_ROOT_PASSWORD=password -v /path/to/where/
 iptables -I DOCKER-USER -i eth0 -p tcp -m conntrack --ctorigdstport 3306 -j REJECT
 ```
 
-You'll then need to create a database in your MySQL instance named "lotus" or whatever you'd like. You'll also need to set up a user named "lotus" or whatever you'd like so long as they have SELECT, INSERT, UPDATE, DELETE, REFERENCES, and CREATE permissions for that database. Update the connection string in the `.env` file accordingly. See `.env.example` for an example. The first time the application is run, the required tables and relationships will be created automatically.
+You'll then need to create a database in your MySQL instance named "lotus" or whatever you'd like. You'll also need to set up a database user named "lotus" or whatever you'd like so long as they have SELECT, INSERT, UPDATE, DELETE, REFERENCES, and CREATE permissions for that database. Update the connection string in the `.env` file accordingly. See `.env.example` for an example. The first time the application is run, the required tables and relationships will be created automatically.
 
 ```env
 DATABASE_URI_DEV="mysql+pymysql://user:password@127.0.0.1:3306/database"
 DATABASE_URI_PROD="mysql+pymysql://user:password@127.0.0.1:3306/database"
+SECRET_KEY="mysecretkey"
 ```
+
+**Note:** to help secure the application, a secret key needs to be supplied. You can generate this using the guide provided by [Flask](https://flask.palletsprojects.com/en/3.0.x/config/#SECRET_KEY). You should never share this key.
 
 ### Development
 
@@ -46,8 +49,6 @@ flask run --debug
 ### Production
 
 A `Dockerfile` is included to run the app in Docker. The following will run the app on port 5000 using [Gunicorn](https://gunicorn.org) with 4 worker threads. Tested on Fedora 38.
-
-**Note:** There is no account suppport for the application. This means that anyone on the network can access your application instance. Consider using something like [Nginx Basic Authentication](https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/) to protect your app instance with a username and password.
 
 ```bash
 # Build the Docker image
