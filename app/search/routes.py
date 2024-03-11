@@ -8,7 +8,7 @@ from app.extensions import db
 from app.models.card import Card
 
 def handle_search():
-    unique_named_cards = db.select(func.min(Card.id)).group_by(Card.name).subquery()
+    unique_named_cards = db.select(func.min(Card.id)).group_by(Card.name)
     query = db.select(Card).where(Card.id.in_(unique_named_cards))
 
     if request.args.get('name'):
