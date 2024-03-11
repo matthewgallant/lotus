@@ -22,6 +22,7 @@ class Deck(db.Model):
     sideboard = db.relationship(
         'DeckCard',
         back_populates='deck',
+        overlaps='mainboard',
         order_by='DeckCard.is_commander.desc()',
         primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board == 's')
     )
