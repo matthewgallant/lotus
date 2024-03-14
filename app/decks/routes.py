@@ -1,5 +1,5 @@
-from flask import render_template, redirect, request, url_for
-from flask_login import login_required
+from flask import render_template, redirect, request, url_for, abort
+from flask_login import login_required, current_user
 
 from app.decks import bp
 from app.extensions import db
@@ -10,9 +10,12 @@ from app.models.deck import Deck
 @bp.route("/")
 @login_required
 def decks():
-    decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
+    # Get decks owned by user
+    query = db.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.id.desc())
+    decks = db.session.execute(query).scalars().all()
     
     # Get color identity
+    # TODO: Make this more efficient
     for deck in decks:
         color_identity = []
         for assoc in deck.mainboard:
@@ -29,6 +32,10 @@ def decks():
 @login_required
 def deck(id):
     deck = db.get_or_404(Deck, id)
+
+    # Unauthorized user
+    if deck.user_id != current_user.id:
+        abort(401)
 
     if request.method == 'GET':
         warning = None
@@ -147,7 +154,7 @@ def add_deck():
         return render_template("decks/add-deck.html")
     else:
         if request.form.get('name'):
-            deck = Deck(name=request.form.get('name'))
+            deck = Deck(current_user.id, request.form.get('name'))
             db.session.add(deck)
             db.session.commit()
             return redirect(url_for('decks.deck', id=deck.id))
@@ -158,6 +165,10 @@ def add_deck():
 @login_required
 def rename_deck(id):
     deck = db.get_or_404(Deck, id)
+
+    # Unauthorized user
+    if deck.user_id != current_user.id:
+        abort(401)
     
     if request.form.get("name"):
         deck.name = request.form.get("name")
@@ -168,11 +179,16 @@ def rename_deck(id):
 @bp.route('/<deck_id>/delete')
 @login_required
 def delete_deck(deck_id):
+    deck = db.get_or_404(Deck, deck_id)
+    
+    # Unauthorized user
+    if deck.user_id != current_user.id:
+        abort(401)
+
     # Delete card associations
     db.session.execute(db.delete(DeckCard).where(DeckCard.deck_id == deck_id))
 
     # Delete deck
-    deck = db.get_or_404(Deck, deck_id)
     db.session.delete(deck)
     db.session.commit()
     

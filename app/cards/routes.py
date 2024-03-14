@@ -1,8 +1,8 @@
 import json
 import requests
 
-from flask import render_template, redirect, request, url_for
-from flask_login import login_required
+from flask import render_template, redirect, request, url_for, abort
+from flask_login import login_required, current_user
 
 from app.cards import bp
 from app.extensions import db
@@ -14,14 +14,30 @@ from app.models.card import Card
 @login_required
 def card(id):
     card = db.get_or_404(Card, id)
-    cards = db.session.execute(db.select(Card).where(Card.name == card.name)).scalars().all()
-    decks = db.session.execute(db.select(Deck).order_by(Deck.id.desc())).scalars().all()
+
+    # Unauthorized user
+    if card.user_id != current_user.id:
+        abort(401)
+    
+    # Get cards owned by user
+    query = db.select(Card).where(Card.name == card.name).where(Card.user_id == current_user.id)
+    cards = db.session.execute(query).scalars().all()
+
+    # Get decks owned by user
+    query = db.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.id.desc())
+    decks = db.session.execute(query).scalars().all()
+
     return render_template("cards/card.html", card=card, cards=cards, decks=decks)
     
 @bp.route('/<card_id>/decks')
 @login_required
 def card_decks(card_id):
     card = db.get_or_404(Card, card_id)
+
+    # Unauthorized user
+    if card.user_id != current_user.id:
+        abort(401)
+
     return render_template("cards/card-decks.html", card=card)
 
 @bp.route("/add")
@@ -40,7 +56,8 @@ def add_card_from_scryfall(scryfall_id):
     if request.args.get('foil'):
         foil = 'foil'
     
-    existing_card = db.session.execute(db.select(Card).where(Card.scryfall_id == scryfall_id).where(Card.foil == foil)).scalar()
+    query = db.select(Card).where(Card.scryfall_id == scryfall_id).where(Card.foil == foil).where(Card.user_id == current_user.id)
+    existing_card = db.session.execute(query).scalar()
 
     if existing_card:
         existing_card.quantity += 1
@@ -84,19 +101,20 @@ def add_card_from_scryfall(scryfall_id):
                 text = data['oracle_text']
 
             new_card = Card(
-                name=name,
-                set_id=set_id,
-                quantity=1,
-                foil=foil,
-                collector_number=collector_number,
-                scryfall_id=scryfall_id,
-                color_identity=color_identity,
-                type_line=type_line,
-                cmc=cmc,
-                power=power,
-                toughness=toughness,
-                rarity=rarity,
-                text=text
+                current_user.id,
+                name,
+                set_id,
+                1, # Quantity
+                foil,
+                collector_number,
+                scryfall_id,
+                color_identity,
+                type_line,
+                cmc,
+                power,
+                toughness,
+                rarity,
+                text
             )
             db.session.add(new_card)
             message = f"{name} has been added to your collection."
@@ -194,19 +212,20 @@ def import_cards():
                                     text = card['oracle_text']
 
                                 new_card = Card(
-                                    name=name,
-                                    set_id=set_id,
-                                    quantity=quantity,
-                                    foil=foil,
-                                    collector_number=collector_number,
-                                    scryfall_id=scryfall_id,
-                                    color_identity=color_identity,
-                                    type_line=type_line,
-                                    cmc=cmc,
-                                    power=power,
-                                    toughness=toughness,
-                                    rarity=rarity,
-                                    text=text
+                                    current_user.id,
+                                    name,
+                                    set_id,
+                                    quantity,
+                                    foil,
+                                    collector_number,
+                                    scryfall_id,
+                                    color_identity,
+                                    type_line,
+                                    cmc,
+                                    power,
+                                    toughness,
+                                    rarity,
+                                    text
                                 )
                                 db.session.add(new_card)
                             else:

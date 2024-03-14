@@ -5,7 +5,7 @@
 {% block main %}
     <h1>Import Cards</h1>
     {% if request.args.error %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-4" role="alert">
             {{ request.args.error }}
             {% if request.args.errors %}
                 <ul class="mb-0">
@@ -16,7 +16,7 @@
             {% endif %}
         </div>
     {% elif request.args.message %}
-        <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
+        <div class="alert alert-success mt-4" role="alert">{{ request.args.message }}</div>
     {% endif %}
     <p>Cards should be formatted like <code>1 Access Tunnel [MKC]</code> or <code>1 Banquet Guests &lt;showcase&gt; [LTC]</code>. Basic lands will be skipped over.</p>
     <form action="{{ url_for('cards.import_cards') }}" method="post">

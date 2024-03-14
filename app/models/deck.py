@@ -1,17 +1,20 @@
+from datetime import datetime
+from sqlalchemy import and_
 from app.extensions import db
 from app.models.deck_card import DeckCard
-from sqlalchemy import and_
 
 class Deck(db.Model):
     __tablename__ = "decks"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(250), nullable=False)
     plains = db.Column(db.Integer)
     island = db.Column(db.Integer)
     swamp = db.Column(db.Integer)
     mountain = db.Column(db.Integer)
     forest = db.Column(db.Integer)
+    created_on = db.Column(db.DateTime, nullable=False)
 
     mainboard = db.relationship(
         'DeckCard',
@@ -27,5 +30,10 @@ class Deck(db.Model):
         primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board == 's')
     )
 
-    def __str__(self):
+    def __init__(self, user_id, name):
+        self.user_id = user_id
+        self.name = name
+        self.created_on = datetime.now()
+
+    def __repr__(self):
         return self.name

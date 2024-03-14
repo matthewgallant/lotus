@@ -12,9 +12,13 @@
         </div>
         <div class="mt-4 mt-sm-0">
             <h1>Welcome to Lotus!</h1>
-            <p class="mb-1">You have {{ "{:,}".format(collection_total) }} cards in your collection.</p>
-            <p>{{ "{:,}".format(unique_total) }} of those are unique cards.</p>
-            <div class="d-flex justify-content-center gap-2">
+            {% if collection_total %}
+                <p class="mb-1">You have {{ "{:,}".format(collection_total) }} cards in your collection.</p>
+            {% endif %}
+            {% if unique_total %}
+                <p>{{ "{:,}".format(unique_total) }} of those are unique cards.</p>
+            {% endif %}
+            <div class="d-flex justify-content-center gap-2 {{ 'mt-3' if not collection_total or unique_total }}">
                 <a href="{{ url_for('search.search') }}" class="btn btn-primary">Search Collection</a>
                 <a href="{{ url_for('decks.decks') }}" class="btn btn-secondary">View Decks</a>
             </div>

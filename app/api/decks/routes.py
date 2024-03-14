@@ -1,5 +1,5 @@
-from flask import request
-from flask_login import login_required
+from flask import request, abort
+from flask_login import login_required, current_user
 
 from app.api.decks import bp
 from app.extensions import db
@@ -18,10 +18,12 @@ def add_card_to_deck(deck_id):
         deck = db.get_or_404(Deck, deck_id)
         card = db.get_or_404(Card, card_id)
 
+        # Unauthorized user
+        if card.user_id != current_user.id or deck.user_id != current_user.id:
+            abort(401)
+
         # Create new deck/card link
-        deck_card = DeckCard()
-        deck_card.card = card
-        deck_card.board = board
+        deck_card = DeckCard(deck.id, card.id, board)
         if board == 'm':
             deck.mainboard.append(deck_card)
         elif board == 's':
@@ -40,9 +42,16 @@ def move_card_board():
         assoc_id = request.form.get("assoc_id")
         board = request.form.get("board")
 
-        assoc = db.session.execute(db.select(DeckCard).where(DeckCard.id == assoc_id)).scalar()
+        # Get association
+        query = db.select(DeckCard).where(DeckCard.id == assoc_id)
+        assoc = db.session.execute(query).scalar()
+
+        # Unauthorized user
+        if assoc.deck.user_id != current_user.id:
+            abort(401)
+
+        # Change and commit board
         assoc.board = board
-        
         db.session.commit()
         
         return { "success": f"{assoc.card.name} has been moved to the {'mainboard' if board == 'm' else 'sideboard'}. Reload to see changes." }
@@ -56,7 +65,15 @@ def set_commander_for_deck():
         assoc_id = request.form.get("assoc_id")
         set_commander = request.form.get("set_commander")
 
-        assoc = db.session.execute(db.select(DeckCard).where(DeckCard.id == assoc_id)).scalar()
+        # Get association
+        query = db.select(DeckCard).where(DeckCard.id == assoc_id)
+        assoc = db.session.execute(query).scalar()
+
+        # Unauthorized user
+        if assoc.deck.user_id != current_user.id:
+            abort(401)
+        
+        # Toggle commander status
         if (set_commander == "set"):
             assoc.is_commander = True
         else:
@@ -74,12 +91,21 @@ def remove_card_from_deck():
     if request.form.get("assoc_id"):
         assoc_id = request.form.get("assoc_id")
 
-        # Get association and delete links
-        assoc = db.session.execute(db.select(DeckCard).where(DeckCard.id == assoc_id)).scalar()
-        db.session.execute(db.delete(DeckCard).where(DeckCard.id == assoc_id))
+        # Get association
+        query = db.select(DeckCard).where(DeckCard.id == assoc_id)
+        assoc = db.session.execute(query).scalar()
 
-        # Need to create string before removal        
+        # Unauthorized user
+        if assoc.deck.user_id != current_user.id:
+            abort(401)
+        
+        # Delete association
+        query = db.delete(DeckCard).where(DeckCard.id == assoc_id)
+        db.session.execute(query)
+
+        # Need to create string before committing
         return_string = { "success": f"{assoc.card.name} has been removed from {assoc.deck.name}." }
+        
         db.session.commit()
 
         return return_string

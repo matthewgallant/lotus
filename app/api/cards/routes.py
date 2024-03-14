@@ -1,5 +1,5 @@
-from flask import request
-from flask_login import login_required
+from flask import request, abort
+from flask_login import login_required, current_user
 
 from app.api.cards import bp
 from app.extensions import db
@@ -11,11 +11,11 @@ from app.models.card import Card
 @login_required
 def autocomplete():
     if request.form.get("query"):
-        cards = db.session.execute(
-            db.select(Card.name)
-                .where(Card.name.like(f'%{request.form.get("query")}%'))
-                .group_by(Card.name)
-            ).scalars().all()
+        # Get autocomplete results of cards owned by user
+        query = db.select(Card.name).where(Card.name.like(f'%{request.form.get("query")}%'))
+        query = query.where(Card.user_id == current_user.id).group_by(Card.name)
+        cards = db.session.execute(query).scalars().all()
+        
         return cards
 
 @bp.route('/<card_id>/quantity', methods=['POST'])
@@ -23,6 +23,10 @@ def autocomplete():
 def edit_card_quantity(card_id):
     if request.form.get('quantity'):
         card = db.get_or_404(Card, card_id)
+
+        # Unauthorized user
+        if card.user_id != current_user.id:
+            abort(401)
         
         card.quantity = request.form.get('quantity')
         db.session.commit()
@@ -36,9 +40,11 @@ def edit_card_quantity(card_id):
 def delete_card():
     if request.form.get("card_id"):
         card_id = request.form.get("card_id")
-
-        # Get the card or 404
         card = db.get_or_404(Card, card_id)
+
+        # Unauthorized user
+        if card.user_id != current_user.id:
+            abort(401)
 
         # Delete card associations
         db.session.execute(db.delete(DeckCard).where(DeckCard.card_id == card_id))
