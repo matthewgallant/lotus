@@ -37,7 +37,7 @@
                 <div class="row">
                     <div class="col-12 col-md-3">
                         <div class="sticky-top pt-3">
-                            <img src="https://api.scryfall.com/cards/{{ deck.mainboard[0].card.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ deck.mainboard[0].card.name }}" id="mainboardCardImage">
+                            <img src="https://api.scryfall.com/cards/{{ deck.mainboard[0].card.details.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ deck.mainboard[0].card.details.name }}" id="mainboardCardImage">
                         </div>
                     </div>
                     <div class="col-12 col-md-9 mt-4 mt-md-0">
@@ -56,20 +56,20 @@
                                 </thead>
                                 <tbody class="align-middle">
                                     {% for assoc in deck.mainboard %}
-                                        <tr data-scryfall-id="{{ assoc.card.scryfall_id }}">
+                                        <tr data-scryfall-id="{{ assoc.card.details.scryfall_id }}">
                                             <td>
-                                                <a href="{{ url_for('cards.card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.name }}</a>
+                                                <a href="{{ url_for('cards.card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.details.name }}</a>
                                                 {% if assoc.is_commander %}
                                                     <span class="badge bg-primary ms-1">Commander</span>
                                                 {% endif %} 
                                             </td>
-                                            <td>{{ assoc.card.set_id }}</td>
-                                            <td class="text-capitalize">{{ assoc.card.rarity|default('N/A', 'true') }}</td>
+                                            <td>{{ assoc.card.details.set_id }}</td>
+                                            <td class="text-capitalize">{{ assoc.card.details.rarity|default('N/A', 'true') }}</td>
                                             <td class="text-capitalize js-foil">{{ assoc.card.foil|default('regular', 'true') }}</td>
                                             <td>
                                                 <div class="d-flex gap-1">
-                                                    {% if assoc.card.color_identity %}
-                                                        {% for color in assoc.card.color_identity.split(',') %}
+                                                    {% if assoc.card.details.color_identity %}
+                                                        {% for color in assoc.card.details.color_identity.split(',') %}
                                                             {% if color == 'W' %}
                                                                 <span class="color-icon color-icon-white"></span>
                                                             {% elif color == 'U' %}
@@ -130,7 +130,7 @@
                 <div class="row">
                     <div class="col-12 col-md-3">
                         <div class="sticky-top pt-3">
-                            <img src="https://api.scryfall.com/cards/{{ deck.sideboard[0].card.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ deck.sideboard[0].card.name }}" id="sideboardCardImage">
+                            <img src="https://api.scryfall.com/cards/{{ deck.sideboard[0].card.details.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ deck.sideboard[0].card.details.name }}" id="sideboardCardImage">
                         </div>
                     </div>
                     <div class="col-12 col-md-9 mt-4 mt-md-0">
@@ -149,20 +149,20 @@
                                 </thead>
                                 <tbody class="align-middle">
                                     {% for assoc in deck.sideboard %}
-                                        <tr data-scryfall-id="{{ assoc.card.scryfall_id }}">
+                                        <tr data-scryfall-id="{{ assoc.card.details.scryfall_id }}">
                                             <td>
-                                                <a href="{{ url_for('cards.card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.name }}</a>
+                                                <a href="{{ url_for('cards.card', id=assoc.card.id) }}" target="_blank">{{ assoc.card.details.name }}</a>
                                                 {% if assoc.is_commander %}
                                                     <span class="badge bg-primary ms-1">Commander</span>
                                                 {% endif %} 
                                             </td>
-                                            <td>{{ assoc.card.set_id }}</td>
-                                            <td class="text-capitalize">{{ assoc.card.rarity|default('N/A', 'true') }}</td>
+                                            <td>{{ assoc.card.details.set_id }}</td>
+                                            <td class="text-capitalize">{{ assoc.card.details.rarity|default('N/A', 'true') }}</td>
                                             <td class="text-capitalize js-foil">{{ assoc.card.foil|default('regular', 'true') }}</td>
                                             <td>
                                                 <div class="d-flex gap-1">
-                                                    {% if assoc.card.color_identity %}
-                                                        {% for color in assoc.card.color_identity.split(',') %}
+                                                    {% if assoc.card.details.color_identity %}
+                                                        {% for color in assoc.card.details.color_identity.split(',') %}
                                                             {% if color == 'W' %}
                                                                 <span class="color-icon color-icon-white"></span>
                                                             {% elif color == 'U' %}
@@ -278,22 +278,17 @@
                                     </thead>
                                     <tbody class="align-middle">
                                         {% for card in cards %}
-                                            <tr data-scryfall-id="{{ card.scryfall_id }}" class="{{ 'table-danger' if card.decks|length >= card.quantity + 1 else 'table-success' }}">
+                                            <tr data-scryfall-id="{{ card.details.scryfall_id }}" class="{{ 'table-danger' if card.decks|length >= card.quantity + 1 else 'table-success' }}">
                                                 <td>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="{{ card.id }}">
-                                                        <label class="form-check-label" for="{{ card.id }}">
-                                                            {{ card.name }}
-                                                            {% if is_commander %}
-                                                                <span class="badge bg-primary ms-1">Commander</span>
-                                                            {% endif %} 
-                                                        </label>
+                                                        <label class="form-check-label" for="{{ card.id }}">{{ card.details.name }}</label>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <a href="{{ url_for('cards.card_decks', card_id=card.id) }}" target="_blank">{{ card.quantity - card.decks|length + 1 }}</a>
                                                 </td>
-                                                <td>{{ card.set_id }}</td>
+                                                <td>{{ card.details.set_id }}</td>
                                                 <td class="text-capitalize js-foil">{{ card.foil|default('regular', 'true') }}</td>
                                         {% endfor %}
                                     </tbody>

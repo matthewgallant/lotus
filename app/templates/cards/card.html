@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ card.name }}{% endblock %}
+{% block title %}{{ card.details.name }}{% endblock %}
 
 {% block main %}
     {% if request.args.error %}
@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-12 col-md-3">
             <div class="sticky-top pt-3">
-                <img src="https://api.scryfall.com/cards/{{ cards[0].scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ card.name }}" id="cardImage">
+                <img src="https://api.scryfall.com/cards/{{ cards[0].details.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ card.details.name }}" id="cardImage">
             </div>
         </div>
         <div class="col-12 col-md-9">
@@ -33,8 +33,8 @@
                     </thead>
                     <tbody class="align-middle">
                         {% for card in cards %}
-                            <tr class="{{ 'table-danger' if card.decks|length >= card.quantity else 'table-success' }}" data-scryfall-id="{{ card.scryfall_id }}">
-                                <td>{{ card.set_id }}</td>
+                            <tr class="{{ 'table-danger' if card.decks|length >= card.quantity else 'table-success' }}" data-scryfall-id="{{ card.details.scryfall_id }}">
+                                <td>{{ card.details.set_id }}</td>
                                 <td>
                                     <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#quantityModal{{ card.id }}">{{ card.quantity }}</button>
                                     <div class="js-quantityModal modal fade" id="quantityModal{{ card.id }}" tabindex="-1" aria-labelledby="quantityModal{{ card.id }}Label" aria-hidden="true">
@@ -61,9 +61,9 @@
                                 <td>
                                     <a href="{{ url_for('cards.card_decks', card_id=card.id) }}">{{ card.quantity - card.decks|length }}</a>
                                 </td>
-                                <td class="text-capitalize">{{ card.rarity|default('N/A', 'true') }}</td>
+                                <td class="text-capitalize">{{ card.details.rarity|default('N/A', 'true') }}</td>
                                 <td class="text-capitalize js-foil">{{ card.foil|default('regular', 'true') }}</td>
-                                <td>{{ card.collector_number|default('N/A', 'true') }}</td>
+                                <td>{{ card.details.collector_number|default('N/A', 'true') }}</td>
                                 <td class="js-price">Loading...</td>
                                 <td>
                                     <div class="dropdown">

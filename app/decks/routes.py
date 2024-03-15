@@ -6,6 +6,7 @@ from app.extensions import db
 
 from app.models.deck_card import DeckCard
 from app.models.deck import Deck
+from app.models.card_details import CardDetails
 
 @bp.route("/")
 @login_required
@@ -19,8 +20,8 @@ def decks():
     for deck in decks:
         color_identity = []
         for assoc in deck.mainboard:
-            if assoc.card.color_identity:
-                colors = assoc.card.color_identity.split(',')
+            if assoc.card.details.color_identity:
+                colors = assoc.card.details.color_identity.split(',')
                 for color in colors:
                     if color not in color_identity:
                         color_identity.append(color)
@@ -103,33 +104,33 @@ def deck(id):
             card = assoc.card
 
             # Check for duplicated
-            if card.name not in card_names:
-                card_names.append(card.name)
+            if card.details.name not in card_names:
+                card_names.append(card.details.name)
             else:
-                duplicates.append(card.name)
+                duplicates.append(card.details.name)
             
             if len(duplicates) > 0:
-                warning = f"There might be duplicates of the following: {', '.join(duplicates)}."
+                warning = f"There are duplicates of the following: {', '.join(duplicates)}."
 
             # Sort cards for gathering
-            if ("legendary" in card.type_line.lower() and "creature" in card.type_line.lower()) or (card.text is not None and "be your commander" in card.text): # Commanders
-                binders["legendary"][card.rarity].append(card)
-            elif card.type_line.lower() == "land": # Lands
-                binders["lands"][card.rarity].append(card)
-            elif card.color_identity == None: # Colorless
-                binders["colorless"][card.rarity].append(card)
-            elif card.color_identity == 'W': # White
-                binders["white"][card.rarity].append(card)
-            elif card.color_identity == 'U': # Blue
-                binders["blue"][card.rarity].append(card)
-            elif card.color_identity == 'B': # Black
-                binders["black"][card.rarity].append(card)
-            elif card.color_identity == 'R': # Red
-                binders["red"][card.rarity].append(card)
-            elif card.color_identity == 'G': # Green
-                binders["green"][card.rarity].append(card)
-            elif card.color_identity: # Multi
-                binders["multi"][card.rarity].append(card)
+            if ("legendary" in card.details.type_line.lower() and "creature" in card.details.type_line.lower()) or (card.details.text is not None and "be your commander" in card.details.text): # Commanders
+                binders["legendary"][card.details.rarity].append(card)
+            elif card.details.type_line.lower() == "land": # Lands
+                binders["lands"][card.details.rarity].append(card)
+            elif card.details.color_identity == None: # Colorless
+                binders["colorless"][card.details.rarity].append(card)
+            elif card.details.color_identity == 'W': # White
+                binders["white"][card.details.rarity].append(card)
+            elif card.details.color_identity == 'U': # Blue
+                binders["blue"][card.details.rarity].append(card)
+            elif card.details.color_identity == 'B': # Black
+                binders["black"][card.details.rarity].append(card)
+            elif card.details.color_identity == 'R': # Red
+                binders["red"][card.details.rarity].append(card)
+            elif card.details.color_identity == 'G': # Green
+                binders["green"][card.details.rarity].append(card)
+            elif card.details.color_identity: # Multi
+                binders["multi"][card.details.rarity].append(card)
             
         return render_template("decks/deck.html", deck=deck, binders=binders, warning=warning)
     else:

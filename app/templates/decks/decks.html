@@ -8,7 +8,7 @@
         <a href="/decks/add" class="btn btn-primary">Add Deck</a>
     </div>
     {% if request.args.message %}
-        <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
+        <div class="alert alert-success mt-3" role="alert">{{ request.args.message }}</div>
     {% endif %}
     {% if decks|length > 0 %}
         <table class="table table-striped table-bordered table-hover mt-3">

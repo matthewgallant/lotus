@@ -1,38 +1,41 @@
 {% extends 'base.html' %}
 
-{% block title %}Decks with {{ card.name }}{% endblock %}
+{% block title %}Decks with {{ card.details.name }}{% endblock %}
 
 {% block main %}
-    <h1>Decks with {{ card.name }}</h1>
+    <h1>Decks with {{ card.details.name }} ({{ card.details.set_id }}, {{ card.details.collector_number }})</h1>
     {% if request.args.message %}
         <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
     {% endif %}
     {% if card.decks|length > 0 %}
-        <table class="table table-striped table-bordered table-hover mt-3">
-            <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Board</th>
-                    {#<th scope="col"></th>#}
-                </tr>
-            </thead>
-            <tbody>
-                {% for assoc in card.decks %}
-                    <tr>
-                        <td>
-                            <a href="{{ url_for('decks.deck', id=assoc.deck.id) }}">{{ assoc.deck.name }}</a>
-                        </td>
-                        <td>{{ 'Mainboard' if assoc.board == 'm' else 'Sideboard' }}</td>
-                        {#<td class="text-center">
-                            <a href="{{ url_for('decks.remove_card_from_deck', deck_id=assoc.deck.id, card_id=card.id, assoc_id=assoc.id) }}" data-bs-toggle="tooltip" data-bs-title="Remove Card From Deck">
-                                <i class="bi-trash-fill"></i>
-                            </a>
-                        </td>#}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="row">
+            <div class="col-12 col-md-3">
+                <div class="sticky-top pt-3">
+                    <img src="https://api.scryfall.com/cards/{{ card.details.scryfall_id }}?format=image" class="img-fluid rounded-4" alt="{{ card.details.name }}" id="cardImage">
+                </div>
+            </div>
+            <div class="col-12 col-md-9">
+                <table class="table table-striped table-bordered table-hover mt-3">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Board</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assoc in card.decks %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('decks.deck', id=assoc.deck.id) }}">{{ assoc.deck.name }}</a>
+                                </td>
+                                <td>{{ 'Mainboard' if assoc.board == 'm' else 'Sideboard' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% else %}
-        <p>No associated decks found for {{ card.name }}.</p>
+        <p>No associated decks found for {{ card.details.name }}.</p>
     {% endif %}
 {% endblock %}

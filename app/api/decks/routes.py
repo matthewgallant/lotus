@@ -31,7 +31,7 @@ def add_card_to_deck(deck_id):
         
         db.session.commit()
         
-        return { "success": f"{card.name} has been added to {deck.name}." }
+        return { "success": f"{card.details.name} has been added to {deck.name}." }
     else:
         return { "error": "An error occured while trying to add the card to the deck." }
 
@@ -54,7 +54,7 @@ def move_card_board():
         assoc.board = board
         db.session.commit()
         
-        return { "success": f"{assoc.card.name} has been moved to the {'mainboard' if board == 'm' else 'sideboard'}. Reload to see changes." }
+        return { "success": f"{assoc.card.details.name} has been moved to the {'mainboard' if board == 'm' else 'sideboard'}. Reload to see changes." }
     else:
         return { "error": "An error occured while moving the card's board." }
     
@@ -81,7 +81,7 @@ def set_commander_for_deck():
         
         db.session.commit()
         
-        return { "success": f"{assoc.card.name} has been {set_commander} as commander. Reload to see changes." }
+        return { "success": f"{assoc.card.details.name} has been {set_commander} as commander. Reload to see changes." }
     else:
         return { "error": "An error occured while trying to change the commander status." }
 
@@ -104,7 +104,7 @@ def remove_card_from_deck():
         db.session.execute(query)
 
         # Need to create string before committing
-        return_string = { "success": f"{assoc.card.name} has been removed from {assoc.deck.name}." }
+        return_string = { "success": f"{assoc.card.details.name} has been removed from {assoc.deck.name}." }
         
         db.session.commit()
 

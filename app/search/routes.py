@@ -6,6 +6,7 @@ from app.search import bp
 from app.extensions import db
 
 from app.models.card import Card
+from app.models.card_details import CardDetails
 
 @bp.route("/", methods=['GET', 'POST'])
 @login_required
@@ -34,7 +35,7 @@ def search():
         return redirect(url_for('search.results', **params))
     else:
         # Get sets owned by user
-        query = db.select(Card.set_id).where(Card.user_id == current_user.id).group_by(Card.set_id)
+        query = db.select(CardDetails.set_id).join(Card.details).where(Card.user_id == current_user.id).group_by(CardDetails.set_id)
         sets = db.session.execute(query)
 
         return render_template("search/search.html", sets=sets)
@@ -42,45 +43,45 @@ def search():
 @bp.route("/results")
 @login_required
 def results():
-    subquery = db.select(func.min(Card.id)).where(Card.user_id == current_user.id).group_by(Card.name)
-    query = db.select(Card).where(Card.id.in_(subquery))
+    subquery = db.select(func.min(CardDetails.id)).join(Card.details).where(Card.user_id == current_user.id).group_by(CardDetails.name)
+    query = db.select(Card).where(Card.card_details_id.in_(subquery)).join(Card.details)
 
     # Process URL args
     if request.args.get('name'):
-        query = query.where(Card.name.like(f'%{request.args.get("name")}%'))
+        query = query.where(CardDetails.name.like(f'%{request.args.get("name")}%'))
     if request.args.get('text'):
-        query = query.where(Card.text.like(f'%{request.args.get("text")}%'))
+        query = query.where(CardDetails.text.like(f'%{request.args.get("text")}%'))
     if request.args.get('type'):
-        query = query.where(Card.type_line.like(f'%{request.args.get("type")}%'))
+        query = query.where(CardDetails.type_line.like(f'%{request.args.get("type")}%'))
     if request.args.get('set'):
-        query = query.where(Card.set_id == request.args.get('set'))
+        query = query.where(CardDetails.set_id == request.args.get('set'))
     if request.args.get('rarity'):
-        query = query.where(Card.rarity == request.args.get('rarity'))
+        query = query.where(CardDetails.rarity == request.args.get('rarity'))
     if request.args.get('color'):
         colors = request.args.get('color').split(',')
         core_colors = ['w', 'u', 'b', 'r', 'g']
         if 'un' in colors:
-            query = query.where(Card.color_identity == None, Card.type_line.notlike('land'))
+            query = query.where(CardDetails.color_identity == None, CardDetails.type_line.notlike('land'))
         else:
             for color in core_colors:
                 if color in colors:
-                    query = query.where(Card.color_identity.contains(color))
+                    query = query.where(CardDetails.color_identity.contains(color))
                 else:
-                    query = query.where(Card.color_identity.notlike(f'%{color}%'))
+                    query = query.where(CardDetails.color_identity.notlike(f'%{color}%'))
     if request.args.get('cmc') and request.args.get('cmcType'):
         cmc = request.args.get('cmc')
         cmcType = request.args.get('cmcType')
 
         if cmcType == 'lessThan':
-            query = query.where(Card.cmc < cmc)
+            query = query.where(CardDetails.cmc < cmc)
         elif cmcType == 'lessThanEqualTo':
-            query = query.where(Card.cmc <= cmc)
+            query = query.where(CardDetails.cmc <= cmc)
         elif cmcType == 'equalTo':
-            query = query.where(Card.cmc == cmc)
+            query = query.where(CardDetails.cmc == cmc)
         elif cmcType == 'greaterThanEqualTo':
-            query = query.where(Card.cmc >= cmc)
+            query = query.where(CardDetails.cmc >= cmc)
         elif cmcType == 'greaterThan':
-            query = query.where(Card.cmc > cmc)
+            query = query.where(CardDetails.cmc > cmc)
     
     # Get paginated card results
     cards = db.paginate(query, per_page=12)
