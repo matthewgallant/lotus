@@ -16,15 +16,20 @@ def decks():
     decks = db.session.execute(query).scalars().all()
     
     # Get color identity
-    # TODO: Make this more efficient
     for deck in decks:
         color_identity = []
-        for assoc in deck.mainboard:
-            if assoc.card.details.color_identity:
-                colors = assoc.card.details.color_identity.split(',')
-                for color in colors:
-                    if color not in color_identity:
-                        color_identity.append(color)
+
+        # Get only commanders for a quick color identity
+        commanders = filter(lambda x: x.is_commander, deck.mainboard)
+        
+        # Gather all colors in all commanders for a given deck
+        for commander in commanders:
+            colors = commander.card.details.color_identity.split(',')
+            for color in colors:
+                if color not in color_identity:
+                    color_identity.append(color)
+
+        # Set the color identity
         deck.color_identity = color_identity
     
     return render_template("decks/decks.html", decks=decks)
