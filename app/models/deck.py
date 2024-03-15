@@ -14,6 +14,7 @@ class Deck(db.Model):
     swamp = db.Column(db.Integer)
     mountain = db.Column(db.Integer)
     forest = db.Column(db.Integer)
+    notes = db.Column(db.String(5000))
     created_on = db.Column(db.DateTime, nullable=False)
 
     mainboard = db.relationship(

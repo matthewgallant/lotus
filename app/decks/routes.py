@@ -167,6 +167,21 @@ def add_deck():
         else:
             return render_template("decks/add-deck.html", error='A deck name is required!.')
 
+@bp.route('/<id>/notes', methods=['POST'])
+@login_required
+def deck_notes(id):
+    deck = db.get_or_404(Deck, id)
+
+    # Unauthorized user
+    if deck.user_id != current_user.id:
+        abort(401)
+    
+    if request.form.get("notes"):
+        deck.notes = request.form.get("notes")
+        db.session.commit()
+    
+    return redirect(url_for('decks.deck', id=deck.id, message='Deck notes have been updated.'))
+
 @bp.route('/<id>/rename', methods=['POST'])
 @login_required
 def rename_deck(id):

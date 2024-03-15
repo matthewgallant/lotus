@@ -28,6 +28,9 @@
             </li>
         {% endif %}
         <li class="nav-item" role="presentation">
+            <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes-tab-pane" type="button" role="tab" aria-controls="notes-tab-pane" aria-selected="false">Notes</button>
+        </li>
+        <li class="nav-item" role="presentation">
             <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-tab-pane" type="button" role="tab" aria-controls="settings-tab-pane" aria-selected="false">Settings</button>
         </li>
     </ul>
@@ -298,6 +301,14 @@
                     {% endfor %}
                 </div>
             </div>
+        </div>
+        <div class="tab-pane fade" id="notes-tab-pane" role="tabpanel" aria-labelledby="notes-tab" tabindex="0">
+            <form action="{{ url_for('decks.deck_notes', id=deck.id) }}" method="post">
+                <div class="mb-3">
+                    <textarea class="form-control" placeholder="Enter some notes here..." aria-label="Notes" name="notes" rows="15">{{ deck.notes if deck.notes }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
         </div>
         <div class="tab-pane fade" id="settings-tab-pane" role="tabpanel" aria-labelledby="settings-tab" tabindex="0">
             <div class="mb-3">
