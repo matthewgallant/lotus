@@ -23,7 +23,12 @@
             <tbody>
                 {% for deck in decks %}
                     <tr>
-                        <td><a href="{{ url_for('decks.deck', id=deck.id) }}">{{ deck.name }}</a></td>
+                        <td>
+                            <a href="{{ url_for('decks.deck', id=deck.id) }}">{{ deck.name }}</a>
+                            {% if deck.archived %}
+                                <span class="badge bg-warning ms-2">Archived</span>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if deck.color_identity %}
                                 <div class="d-flex gap-1">

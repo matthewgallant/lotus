@@ -9,6 +9,7 @@ class Deck(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(250), nullable=False)
+    archived = db.Column(db.Boolean)
     plains = db.Column(db.Integer)
     island = db.Column(db.Integer)
     swamp = db.Column(db.Integer)
@@ -21,14 +22,14 @@ class Deck(db.Model):
         'DeckCard',
         back_populates='deck',
         order_by='DeckCard.is_commander.desc()',
-        primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board == 'm')
+        primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board.in_(('m', 'am')))
     )
     sideboard = db.relationship(
         'DeckCard',
         back_populates='deck',
         overlaps='mainboard',
         order_by='DeckCard.is_commander.desc()',
-        primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board == 's')
+        primaryjoin=and_(DeckCard.deck_id == id, DeckCard.board.in_(('s', 'as')))
     )
 
     def __init__(self, user_id, name):

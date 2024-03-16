@@ -13,7 +13,13 @@ class Card(db.Model):
 
     user = db.relationship('User')
     details = db.relationship('CardDetails')
-    decks = db.relationship('DeckCard', back_populates='card')
+    
+    # Only get active (not archived) decks
+    decks = db.relationship(
+        'DeckCard',
+        back_populates='card',
+        primaryjoin="and_(Card.id == DeckCard.card_id, DeckCard.board.in_(('m', 's')))"
+    )
 
     def __init__(self, user_id, card_details_id, quantity, foil):
         self.user_id = user_id

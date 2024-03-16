@@ -4,6 +4,9 @@
 
 {% block main %}
     <h1 class="d-flex align-items-center mb-4">{{ deck.name }} <span class="badge bg-secondary ms-4 js-priceBadge">Loading Price...</span></h1>
+    {% if deck.archived %}
+        <div class="alert alert-warning mt-4" role="alert">This deck is currently archived.</div>
+    {% endif %}
     {% if warning %}
         <div class="alert alert-warning mt-4" role="alert">{{ warning }}</div>
     {% endif %}
@@ -320,6 +323,45 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>
+            </div>
+            <div class="mb-3">
+                {% if deck.archived %}
+                    <h2>Unarchive Deck</h2>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#unarchiveModal">Unarchive Deck</button>
+                    <div class="modal fade" id="unarchiveModal" tabindex="-1" aria-labelledby="unarchiveModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="unarchiveModalLabel">Unarchive Deck</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">Are you sure you want to unarchive {{ deck.name }}? The cards/quantities in this deck will be marked as unavailable.</div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="{{ url_for('decks.unarchive_deck', deck_id=deck.id) }}" class="btn btn-warning">Unarchive</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <h2>Archive Deck</h2>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#archiveModal">Archive Deck</button>
+                    <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="archiveModalLabel">Archive Deck</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">Are you sure you want to archive {{ deck.name }}? The deck will remain but it's card will become available for other decks.</div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="{{ url_for('decks.archive_deck', deck_id=deck.id) }}" class="btn btn-warning">Archive</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
             <div>
                 <h2>Delete Deck</h2>

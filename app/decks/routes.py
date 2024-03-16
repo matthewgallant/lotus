@@ -197,6 +197,50 @@ def rename_deck(id):
     
     return redirect(url_for('decks.deck', id=deck.id, message='Deck name has been updated.'))
 
+@bp.route('/<deck_id>/archive')
+@login_required
+def archive_deck(deck_id):
+    deck = db.get_or_404(Deck, deck_id)
+    
+    # Unauthorized user
+    if deck.user_id != current_user.id:
+        abort(401)
+
+    # Change card associations to archived values
+    for assoc in deck.mainboard:
+        assoc.board = 'am'
+    for assoc in deck.sideboard:
+        assoc.board = 'as'
+    
+    # Change deck to archived
+    deck.archived = True
+    
+    db.session.commit()
+    
+    return redirect(url_for('decks.deck', id=deck_id, message=f"{deck.name} has been archived."))
+
+@bp.route('/<deck_id>/unarchive')
+@login_required
+def unarchive_deck(deck_id):
+    deck = db.get_or_404(Deck, deck_id)
+    
+    # Unauthorized user
+    if deck.user_id != current_user.id:
+        abort(401)
+
+    # Change card associations to unarchived values
+    for assoc in deck.mainboard:
+        assoc.board = 'm'
+    for assoc in deck.sideboard:
+        assoc.board = 's'
+    
+    # Change deck to unarchived
+    deck.archived = False
+    
+    db.session.commit()
+    
+    return redirect(url_for('decks.deck', id=deck_id, message=f"{deck.name} has been unarchived."))
+
 @bp.route('/<deck_id>/delete')
 @login_required
 def delete_deck(deck_id):

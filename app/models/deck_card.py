@@ -8,7 +8,7 @@ class DeckCard(db.Model):
     deck_id = db.Column(db.Integer, db.ForeignKey('decks.id'), nullable=False)
     card_id = db.Column(db.Integer, db.ForeignKey('cards.id'), nullable=False)
     is_commander = db.Column(db.Boolean)
-    board = db.Column(db.String(1))
+    board = db.Column(db.String(2))
     created_on = db.Column(db.DateTime, nullable=False)
 
     deck = db.relationship('Deck')
