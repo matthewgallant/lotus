@@ -43,8 +43,9 @@ class Utilities {
             await fetch(`https://api.scryfall.com/cards/collection`, options)
                 .then(res => res.json())
                 .then(data => {
-                    data?.data.forEach(card => {
-                        const row = rowsArray.find(row => row.dataset.scryfallId === card.id);
+                    for (let i = 0; i < rows.length; i++) {
+                        const row = rows[i];
+                        const card = data?.data[i];
                         const priceEl = row.querySelector('.js-price');
                         const foilEl = row.querySelector('.js-foil');
 
@@ -56,9 +57,8 @@ class Utilities {
                             priceEl.innerText = `$${card['prices']['usd_foil']}`;
                         } else if (card?.prices?.usd_etched) {
                             totalPrice += parseFloat(card['prices']['usd_etched']);
-                            priceEl.innerText = `$${card['prices']['usd_etched']}`;
                         }
-                    });
+                    }
                 });
         }
 
