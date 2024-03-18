@@ -25,7 +25,7 @@ class Utilities {
     async livePriceLoading(rows) {
         let totalPrice = 0;
         const rowsArray = Array.from(rows);
-        
+
         for (let i = 0; i < rowsArray.length; i += 75) {
             const chunk = rowsArray.slice(i, i + 75);
             const ids = chunk.map(row => ({ id: row.dataset.scryfallId }));
@@ -43,9 +43,9 @@ class Utilities {
             await fetch(`https://api.scryfall.com/cards/collection`, options)
                 .then(res => res.json())
                 .then(data => {
-                    for (let i = 0; i < rows.length; i++) {
-                        const row = rows[i];
-                        const card = data?.data[i];
+                    for (let j = 0; j < ids.length; j++) {
+                        const row = rows[i + j];
+                        const card = data?.data[j];
                         const priceEl = row.querySelector('.js-price');
                         const foilEl = row.querySelector('.js-foil');
 
