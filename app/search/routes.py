@@ -43,8 +43,8 @@ def search():
 @bp.route("/results")
 @login_required
 def results():
-    subquery = db.select(func.min(CardDetails.id)).join(Card.details).where(Card.user_id == current_user.id).group_by(CardDetails.name)
-    query = db.select(Card).where(Card.card_details_id.in_(subquery)).join(Card.details)
+    subquery = db.select(func.min(Card.id)).join(Card.details).where(Card.user_id == current_user.id).group_by(CardDetails.name)
+    query = db.select(Card).where(Card.id.in_(subquery)).join(Card.details)
 
     # Process URL args
     if request.args.get('name'):
