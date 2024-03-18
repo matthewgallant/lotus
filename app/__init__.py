@@ -44,6 +44,6 @@ def create_app(config_class=Config):
     # Handle 404s
     @app.errorhandler(404) 
     def not_found(error):
-        return render_template("404.html")
+        return render_template("404.html"), 404
 
     return app

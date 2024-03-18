@@ -14,7 +14,7 @@ class ResultsPage {
     setupInfiniteScroll() {
         // Create intersection observer for last card
         this.observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
+            entries.forEach(async entry => {
                 if (entry.isIntersecting) {
                     // Delete last observer when done
                     this.observer.unobserve(this.cardEls[this.cardEls.length - 1]);
@@ -23,18 +23,21 @@ class ResultsPage {
                     this.page += 1;
 
                     // Request another page of cards
-                    fetch(`/search/results${window.location.search ? window.location.search + '&' : '?'}page=${this.page}`)
-                        .then(res => res.text())
-                        .then(html => {
+                    const page = `/search/results${window.location.search ? window.location.search + '&' : '?'}page=${this.page}`;
+                    const res = await fetch(page);
+                    if (res.status === 200) {
+                        const data = await res.text();
+                        if (data != null) {
                             // Inject cards HTML
-                            this.cardsEl.innerHTML += html;
+                            this.cardsEl.innerHTML += data;
 
                             // Create observer for new last card
                             this.cardEls = document.querySelectorAll('.js-card');
                             if (this.cardEls.length % 12 == 0) {
                                 this.observer.observe(this.cardEls[this.cardEls.length - 1]);
                             }
-                        });
+                        }
+                    }
                 }
             });
         });
