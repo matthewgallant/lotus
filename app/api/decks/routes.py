@@ -81,7 +81,7 @@ def set_commander_for_deck():
         
         db.session.commit()
         
-        return { "success": f"{assoc.card.details.name} has been {set_commander} as commander. Reload to see changes." }
+        return { "success": f"{assoc.card.details.name} has been {'set' if assoc.is_commander else 'unset'} as commander. Reload to see changes." }
     else:
         return { "error": "An error occured while trying to change the commander status." }
 

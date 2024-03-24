@@ -32,7 +32,7 @@ def edit_card_quantity(card_id):
         card.quantity = request.form.get('quantity')
         db.session.commit()
         
-        return { "success": f"The for {card.details.name} ({card.details.set_id}, {card.details.collector_number}) quantity has been changed to {request.form.get('quantity')}. Reload to see changes." }
+        return { "success": f"The for {card.details.name} ({card.details.set_id}, {card.details.collector_number}) quantity has been changed to {card.quantity}. Reload to see changes." }
     else:
         return { "error": "A quantity if required to update." }
 
