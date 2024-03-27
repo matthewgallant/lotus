@@ -7,6 +7,7 @@ from app.extensions import db
 from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 from app.models.card_details import CardDetails
+from app.models.message_log import MessageLog
 
 @bp.route("/")
 @login_required
@@ -150,7 +151,11 @@ def deck(id):
         if request.form.get('forest'):
             deck.forest = int(request.form.get('forest'))
         
+        # Add message log entry
+        message = MessageLog(f"Lands for '{deck}' have been updated.")
+        db.session.add(message)
         db.session.commit()
+
         return redirect(url_for('decks.deck', id=deck.id, message='Basic lands have been updated for this deck.'))
 
 @bp.route("/add", methods=['GET', 'POST'])
@@ -163,6 +168,12 @@ def add_deck():
             deck = Deck(current_user.id, request.form.get('name'))
             db.session.add(deck)
             db.session.commit()
+
+            # Add message log entry
+            message = MessageLog(f"New deck '{deck}' has been added.")
+            db.session.add(message)
+            db.session.commit()
+            
             return redirect(url_for('decks.deck', id=deck.id))
         else:
             return render_template("decks/add-deck.html", error='A deck name is required!.')
@@ -178,6 +189,10 @@ def deck_notes(id):
     
     if request.form.get("notes"):
         deck.notes = request.form.get("notes")
+
+        # Add message log entry
+        message = MessageLog(f"Notes for '{deck}' have been updated.")
+        db.session.add(message)
         db.session.commit()
     
     return redirect(url_for('decks.deck', id=deck.id, message='Deck notes have been updated.'))
@@ -192,7 +207,13 @@ def rename_deck(id):
         abort(401)
     
     if request.form.get("name"):
-        deck.name = request.form.get("name")
+        name = request.form.get("name")
+
+        # Add message log entry
+        message = MessageLog(f"Name for '{deck}' has been updated to '{name}'.")
+        db.session.add(message)
+
+        deck.name = name
         db.session.commit()
     
     return redirect(url_for('decks.deck', id=deck.id, message='Deck name has been updated.'))
@@ -214,7 +235,10 @@ def archive_deck(deck_id):
     
     # Change deck to archived
     deck.archived = True
-    
+
+    # Add message log entry
+    message = MessageLog(f"Deck '{deck}' has been archived.")
+    db.session.add(message)
     db.session.commit()
     
     return redirect(url_for('decks.deck', id=deck_id, message=f"{deck.name} has been archived."))
@@ -236,7 +260,10 @@ def unarchive_deck(deck_id):
     
     # Change deck to unarchived
     deck.archived = False
-    
+
+    # Add message log entry
+    message = MessageLog(f"Deck '{deck}' has been unarchived.")
+    db.session.add(message)
     db.session.commit()
     
     return redirect(url_for('decks.deck', id=deck_id, message=f"{deck.name} has been unarchived."))
@@ -252,6 +279,10 @@ def delete_deck(deck_id):
 
     # Delete card associations
     db.session.execute(db.delete(DeckCard).where(DeckCard.deck_id == deck_id))
+
+    # Add message log entry
+    message = MessageLog(f"Deck '{deck}' has been deleted.")
+    db.session.add(message)
 
     # Delete deck
     db.session.delete(deck)

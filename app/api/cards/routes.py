@@ -7,6 +7,7 @@ from app.extensions import db
 from app.models.deck_card import DeckCard
 from app.models.card import Card
 from app.models.card_details import CardDetails
+from app.models.message_log import MessageLog
 
 @bp.route('/autocomplete', methods=['POST'])
 @login_required
@@ -30,6 +31,10 @@ def edit_card_quantity(card_id):
             abort(401)
         
         card.quantity = request.form.get('quantity')
+
+        # Add message log entry
+        message = MessageLog(f"Quantity for '{card}' has been changed to {card.quantity}.")
+        db.session.add(message)
         db.session.commit()
         
         return { "success": f"The for {card.details.name} ({card.details.set_id}, {card.details.collector_number}) quantity has been changed to {card.quantity}. Reload to see changes." }
@@ -52,6 +57,10 @@ def delete_card():
 
         # Need to create string before committing
         return_string = f"{card.details.name} ({card.details.set_id}, {card.details.collector_number}) has been deleted. Reload to see changes."
+
+        # Add message log entry
+        message = MessageLog(f"Card '{card}' has been deleted.")
+        db.session.add(message)
 
         # Delete card
         db.session.delete(card)

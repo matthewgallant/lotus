@@ -10,6 +10,7 @@ from app.extensions import db
 from app.models.deck import Deck
 from app.models.card import Card
 from app.models.card_details import CardDetails
+from app.models.message_log import MessageLog
 
 @bp.route("/<id>")
 @login_required
@@ -65,6 +66,10 @@ def add_card_from_scryfall(scryfall_id):
     if existing_card:
         existing_card.quantity += 1
         message = f"{existing_card.name}'s quantity has been increased."
+
+        # Add message log entry
+        message = MessageLog(f"Quantity for '{existing_card}' has been increased.")
+        db.session.add(message)
     else:
         # Find if we have the card details already
         query = db.select(CardDetails).where(CardDetails.scryfall_id == scryfall_id)
@@ -126,6 +131,11 @@ def add_card_from_scryfall(scryfall_id):
                 )
                 db.session.add(new_details)
                 db.session.flush()
+
+                # Add message log entry
+                message = MessageLog(f"New card details '{new_details}' has been added.")
+                db.session.add(message)
+
                 details_id = new_details.id
             else:
                 error = "An error has occured when trying to add the card."
@@ -140,6 +150,11 @@ def add_card_from_scryfall(scryfall_id):
         )
         db.session.add(new_card)
         db.session.flush()
+
+        # Add message log entry
+        message = MessageLog(f"New card '{new_card}' has been added.")
+        db.session.add(message)
+
         message = f"{new_card.details.name} has been added to your collection."
 
     db.session.commit()
@@ -254,6 +269,11 @@ def import_cards():
                                         )
                                         db.session.add(new_details)
                                         db.session.flush()
+
+                                        # Add message log entry
+                                        message = MessageLog(f"New card details '{new_details}' has been added.")
+                                        db.session.add(message)
+
                                         details_id = new_details.id
 
                                     if details_id:
@@ -264,6 +284,11 @@ def import_cards():
                                             foil
                                         )
                                         db.session.add(new_card)
+                                        db.session.flush()
+
+                                        # Add message log entry
+                                        message = MessageLog(f"New card '{new_card}' has been added.")
+                                        db.session.add(message)
                                 else:
                                     error = True
                                     errors.append(line)

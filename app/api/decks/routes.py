@@ -7,6 +7,7 @@ from app.extensions import db
 from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 from app.models.card import Card
+from app.models.message_log import MessageLog
 
 @bp.route('/<deck_id>/add', methods=['POST'])
 @login_required
@@ -28,6 +29,10 @@ def add_card_to_deck(deck_id):
             deck.mainboard.append(deck_card)
         elif board == 's':
             deck.sideboard.append(deck_card)
+        
+        # Add message log entry
+        message = MessageLog(f"Card '{card}' has been added to deck '{deck}'.")
+        db.session.add(message)
         
         db.session.commit()
         
@@ -52,6 +57,11 @@ def move_card_board():
 
         # Change and commit board
         assoc.board = board
+
+        # Add message log entry
+        message = MessageLog(f"Association '{assoc}' has been moved to board '{board}'.")
+        db.session.add(message)
+
         db.session.commit()
         
         return { "success": f"{assoc.card.details.name} has been moved to the {'mainboard' if board == 'm' else 'sideboard'}. Reload to see changes." }
@@ -79,6 +89,10 @@ def set_commander_for_deck():
         else:
             assoc.is_commander = False
         
+        # Add message log entry
+        message = MessageLog(f"Association '{assoc}' has been {'set' if assoc.is_commander else 'unset'} as commander.")
+        db.session.add(message)
+        
         db.session.commit()
         
         return { "success": f"{assoc.card.details.name} has been {'set' if assoc.is_commander else 'unset'} as commander. Reload to see changes." }
@@ -103,6 +117,10 @@ def remove_card_from_deck():
         query = db.delete(DeckCard).where(DeckCard.id == assoc_id)
         db.session.execute(query)
 
+        # Add message log entry
+        message = MessageLog(f"Association '{assoc}' has been removed.")
+        db.session.add(message)
+
         # Need to create string before committing
         return_string = { "success": f"{assoc.card.details.name} has been removed from {assoc.deck.name}." }
         
@@ -111,4 +129,3 @@ def remove_card_from_deck():
         return return_string
     else:
         return { "error": "An error occured when trying to remove card from deck." }
-    

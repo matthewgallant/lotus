@@ -5,6 +5,7 @@ from app.accounts import bp
 from app.extensions import db, bcrypt
 
 from app.models.user import User
+from app.models.message_log import MessageLog
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -20,6 +21,11 @@ def login():
             user = db.session.execute(db.select(User).where(User.email == email)).scalar_one_or_none()
             if user:
                 if bcrypt.check_password_hash(user.password, password):
+                    # Add message log entry
+                    message = MessageLog(f"User '{user}' has been logged in.")
+                    db.session.add(message)
+                    db.session.commit()
+
                     if remember:
                         login_user(user, remember=True)
                     else:
@@ -87,6 +93,11 @@ def register():
                         # Create user in database
                         user = User(name=name, email=email, password=password)
                         db.session.add(user)
+                        db.session.commit()
+
+                        # Add message log entry
+                        message = MessageLog(f"User '{user}' has been registered.")
+                        db.session.add(message)
                         db.session.commit()
 
                         # Log the user in and go home
