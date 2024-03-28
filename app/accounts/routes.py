@@ -1,5 +1,6 @@
 from flask import render_template, redirect, request, url_for, abort
 from flask_login import login_required, login_user, logout_user
+from urllib.parse import urlparse
 
 from app.accounts import bp
 from app.extensions import db, bcrypt
@@ -16,7 +17,6 @@ def login():
             email = request.form.get("email")
             password = request.form.get("password")
             remember = request.form.get("remember")
-            next = request.args.get('next')
 
             user = db.session.execute(db.select(User).where(User.email == email)).scalar_one_or_none()
             if user:
@@ -41,10 +41,12 @@ def login():
             return render_template("accounts/login.html", error=error)
         else:
             # Prevent open redirects
-            if next:
-                if "http" in next:
-                    return abort(400)
-        
+            next = request.args.get('next', '')
+            next = next.replace('\\', '')
+            if not urlparse(next).netloc:
+                # relative path, safe to redirect
+                return redirect(next, code=302)
+            # ignore the target and redirect to the home page
             return redirect(next or url_for("main.index", message="Your account has been logged in successfully."))
     else:
         return render_template("accounts/login.html")

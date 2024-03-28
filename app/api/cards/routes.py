@@ -1,5 +1,6 @@
 from flask import request, abort
 from flask_login import login_required, current_user
+from markupsafe import escape
 
 from app.api.cards import bp
 from app.extensions import db
@@ -30,14 +31,15 @@ def edit_card_quantity(card_id):
         if card.user_id != current_user.id:
             abort(401)
         
-        card.quantity = request.form.get('quantity')
+        quantity = int(request.form.get('quantity'))
+        card.quantity = quantity
 
         # Add message log entry
         message = MessageLog(f"Quantity for '{card}' has been changed to {card.quantity}.")
         db.session.add(message)
         db.session.commit()
         
-        return { "success": f"The for {card.details.name} ({card.details.set_id}, {card.details.collector_number}) quantity has been changed to {card.quantity}. Reload to see changes." }
+        return { "success": f"The quantity for {card.details.name} ({card.details.set_id}, {card.details.collector_number}) has been changed to {escape(quantity)}. Reload to see changes." }
     else:
         return { "error": "A quantity if required to update." }
 
