@@ -47,7 +47,7 @@ def login():
                 # relative path, safe to redirect
                 return redirect(next, code=302)
             # ignore the target and redirect to the home page
-            return redirect(next or url_for("main.index", message="Your account has been logged in successfully."))
+            return redirect(url_for("main.index", message="Your account has been logged in successfully."))
     else:
         return render_template("accounts/login.html")
 
