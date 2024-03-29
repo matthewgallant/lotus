@@ -21,14 +21,22 @@ def decks():
         color_identity = []
 
         # Get only commanders for a quick color identity
-        commanders = filter(lambda x: x.is_commander, deck.mainboard)
+        commanders = list(filter(lambda x: x.is_commander, deck.mainboard))
         
-        # Gather all colors in all commanders for a given deck
-        for commander in commanders:
-            colors = commander.card.details.color_identity.split(',')
-            for color in colors:
-                if color not in color_identity:
-                    color_identity.append(color)
+        # Gather all colors in all commanders for a given deck (faster)
+        if len(commanders) > 0:
+            for commander in commanders:
+                colors = commander.card.details.color_identity.split(',')
+                for color in colors:
+                    if color not in color_identity:
+                        color_identity.append(color)
+        # No commander, get color identity from cards (slower)
+        else:
+            for card in deck.mainboard:
+                colors = card.card.details.color_identity.split(',')
+                for color in colors:
+                    if color not in color_identity:
+                        color_identity.append(color)
 
         # Set the color identity
         deck.color_identity = color_identity
