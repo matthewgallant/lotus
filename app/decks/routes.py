@@ -14,7 +14,7 @@ from app.models.message_log import MessageLog
 def decks():
     # Get decks owned by user
     query = db.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.id.desc())
-    decks = db.session.execute(query).scalars().all()
+    decks = db.paginate(query, per_page=10)
     
     # Get color identity
     for deck in decks:

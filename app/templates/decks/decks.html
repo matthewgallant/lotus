@@ -10,7 +10,8 @@
     {% if request.args.message %}
         <div class="alert alert-success mt-3" role="alert">{{ request.args.message }}</div>
     {% endif %}
-    {% if decks|length > 0 %}
+    {% if decks.items|length > 0 %}
+        <p>Showing {{ decks.first }} - {{ decks.last }} of {{ decks.total }}</p>
         <table class="table table-striped table-bordered table-hover mt-3">
             <thead>
                 <tr>
@@ -56,6 +57,39 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% if decks.pages > 1 %}
+            <nav aria-label="page navigation">
+                <ul class="pagination">
+                    {% if decks.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('decks.decks', page=decks.prev_num) }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    {% for page in decks.iter_pages() %}
+                        {% if page %}
+                            {% if page != decks.page %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('decks.decks', page=page) }}">{{ page }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page }}</span>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item">
+                                <span class="page-link">&hellip;</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if decks.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('decks.decks', page=decks.next_num) }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}">
     {% else %}
         <p>No decks found. <a href="/decks/add">Add Your First One</a></p>
