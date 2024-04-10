@@ -45,5 +45,10 @@ def create_app(config_class=Config):
     @app.errorhandler(404) 
     def not_found(error):
         return render_template("404.html"), 404
+    
+    @app.after_request
+    def add_security_headers(resp):
+        resp.headers['Content-Security-Policy'] = "default-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://api.scryfall.com; img-src 'self' https://api.scryfall.com https://cards.scryfall.io data:;"
+        return resp
 
     return app
