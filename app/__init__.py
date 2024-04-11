@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 
 from config import Config
-from app.extensions import db, bcrypt, login_manager
+from app.extensions import db, bcrypt, login_manager, scheduler
 
 from app.main import bp as main_bp
 from app.accounts import bp as account_bp
@@ -13,6 +13,8 @@ from app.api.decks import bp as api_decks_bp
 
 from app.models.user import User
 
+from app.jobs import update_prices
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -22,11 +24,13 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "account.login"
+    scheduler.init_app(app)
+    scheduler.start()
 
     # Create tables if needed
     with app.app_context():
         db.create_all()
-    
+
     # Create login user loader
     @login_manager.user_loader
     def load_user(user_id):
