@@ -16,9 +16,12 @@ class CardDetails(db.Model):
     toughness = db.Column(db.String(10))
     rarity = db.Column(db.String(10))
     text = db.Column(db.String(5000))
+    price_regular = db.Column(db.Float)
+    price_foil = db.Column(db.Float)
+    price_etched = db.Column(db.Float)
     created_on = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, name, set_id, collector_number, color_identity, scryfall_id, type_line, cmc, power, toughness, rarity, text):
+    def __init__(self, name, set_id, collector_number, color_identity, scryfall_id, type_line, cmc, power, toughness, rarity, text, price_regular, price_foil, price_etched):
         self.name = name
         self.set_id = set_id
         self.collector_number = collector_number
@@ -30,6 +33,9 @@ class CardDetails(db.Model):
         self.toughness = toughness
         self.rarity = rarity
         self.text = text
+        self.price_regular = price_regular
+        self.price_foil = price_foil
+        self.price_etched = price_etched
         self.created_on = datetime.now()
 
     def __repr__(self):

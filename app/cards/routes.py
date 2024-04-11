@@ -93,6 +93,9 @@ def add_card_from_scryfall(scryfall_id):
                 toughness = None
                 rarity = None
                 text = None
+                price_regular = None
+                price_foil = None
+                price_etched = None
 
                 if 'name' in data:
                     name = data['name']
@@ -115,6 +118,13 @@ def add_card_from_scryfall(scryfall_id):
                     rarity = data['rarity']
                 if 'oracle_text' in data:
                     text = data['oracle_text']
+                if 'prices' in data:
+                    if 'usd' in data['prices']:
+                        price_regular = data['prices']['usd']
+                    if 'usd_foil' in data['prices']:
+                        price_foil = data['prices']['usd_foil']
+                    if 'usd_etched' in data['prices']:
+                        price_etched = data['prices']['usd_etched']
                 
                 new_details = CardDetails(
                     name,
@@ -127,7 +137,10 @@ def add_card_from_scryfall(scryfall_id):
                     power,
                     toughness,
                     rarity,
-                    text
+                    text,
+                    price_regular,
+                    price_foil,
+                    price_etched
                 )
                 db.session.add(new_details)
                 db.session.flush()
@@ -222,6 +235,9 @@ def import_cards():
                                     toughness = None
                                     rarity = None
                                     text = None
+                                    price_regular = None
+                                    price_foil = None
+                                    price_etched = None
 
                                     if 'id' in card:
                                         scryfall_id = card['id']
@@ -246,6 +262,13 @@ def import_cards():
                                         rarity = card['rarity']
                                     if 'oracle_text' in card:
                                         text = card['oracle_text']
+                                    if 'prices' in data:
+                                        if 'usd' in data['prices']:
+                                            price_regular = data['prices']['usd']
+                                        if 'usd_foil' in data['prices']:
+                                            price_foil = data['prices']['usd_foil']
+                                        if 'usd_etched' in data['prices']:
+                                            price_etched = data['prices']['usd_etched']
                                     
                                     query = db.select(CardDetails).where(CardDetails.scryfall_id == scryfall_id)
                                     existing_details = db.session.execute(query).scalar_one_or_none()
@@ -265,7 +288,10 @@ def import_cards():
                                             power,
                                             toughness,
                                             rarity,
-                                            text
+                                            text,
+                                            price_regular,
+                                            price_foil,
+                                            price_etched
                                         )
                                         db.session.add(new_details)
                                         db.session.flush()
