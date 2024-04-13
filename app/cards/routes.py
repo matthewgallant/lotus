@@ -3,6 +3,7 @@ import requests
 
 from flask import render_template, redirect, request, url_for, abort
 from flask_login import login_required, current_user
+from sqlalchemy import and_
 
 from app.cards import bp
 from app.extensions import db
@@ -11,6 +12,27 @@ from app.models.deck import Deck
 from app.models.card import Card
 from app.models.card_details import CardDetails
 from app.models.message_log import MessageLog
+
+@bp.route("/")
+def cards():
+    # Get cards owned by user
+    query = db.select(Card).join(Card.details).order_by(
+        db.case(
+            (and_(Card.foil == "regular", CardDetails.price_regular), CardDetails.price_regular),
+            (and_(Card.foil == "foil", CardDetails.price_foil), CardDetails.price_foil),
+            (and_(Card.foil == "foil", CardDetails.price_etched), CardDetails.price_etched),
+            (CardDetails.price_regular, CardDetails.price_regular),
+            (CardDetails.price_foil, CardDetails.price_foil),
+            (CardDetails.price_etched, CardDetails.price_etched)
+        ).desc()
+    )
+    cards = db.paginate(query, per_page=50)
+
+    # Get decks owned by user
+    query = db.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.id.desc())
+    decks = db.session.execute(query).scalars().all()
+    
+    return render_template("cards/cards.html", cards=cards, decks=decks)
 
 @bp.route("/<id>")
 @login_required

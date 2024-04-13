@@ -15,7 +15,6 @@ class CardPage {
         this.utilities = new Utilities();
 
         this.utilities.enableDynamicCardImages(this.rows, this.cardImageEl);
-        this.utilities.livePriceLoading(this.rows);
         this.setupRowActionEventListeners();
         this.setupQuantityModalEventListeners();
     }

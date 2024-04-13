@@ -22,49 +22,6 @@ class Utilities {
         }
     }
 
-    async livePriceLoading(rows) {
-        let totalPrice = 0;
-        const rowsArray = Array.from(rows);
-
-        for (let i = 0; i < rowsArray.length; i += 75) {
-            const chunk = rowsArray.slice(i, i + 75);
-            const ids = chunk.map(row => ({ id: row.dataset.scryfallId }));
-
-            const options = {
-                method: "POST",
-                body: JSON.stringify({
-                    identifiers: ids
-                }),
-                headers: {
-                    "Content-Type": "application/json"
-                } 
-            }
-            
-            await fetch(`https://api.scryfall.com/cards/collection`, options)
-                .then(res => res.json())
-                .then(data => {
-                    for (let j = 0; j < ids.length; j++) {
-                        const row = rows[i + j];
-                        const card = data?.data[j];
-                        const priceEl = row.querySelector('.js-price');
-                        const foilEl = row.querySelector('.js-foil');
-
-                        if (foilEl.innerText.toLowerCase() === 'regular' && card.prices.usd) {
-                            totalPrice += parseFloat(card['prices']['usd']);
-                            priceEl.innerText = `$${card['prices']['usd']}`;
-                        } else if (card?.prices?.usd_foil) {
-                            totalPrice += parseFloat(card['prices']['usd_foil']);
-                            priceEl.innerText = `$${card['prices']['usd_foil']}`;
-                        } else if (card?.prices?.usd_etched) {
-                            totalPrice += parseFloat(card['prices']['usd_etched']);
-                        }
-                    }
-                });
-        }
-
-        return totalPrice;
-    }
-
     async postDataToAPI(endpoint, body, errorToastBody, errorToast, successToastBody, successToast) {
         const options = {
             method: "POST",

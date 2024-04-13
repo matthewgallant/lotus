@@ -3,7 +3,7 @@
 {% block title %}{{ deck.name }}{% endblock %}
 
 {% block main %}
-    <h1 class="d-flex align-items-center mb-4">{{ deck.name }} <span class="badge bg-secondary ms-4 js-priceBadge">Loading Price...</span></h1>
+    <h1 class="d-flex align-items-center mb-4">{{ deck.name }} <span class="badge bg-secondary ms-4">${{ '%0.2f'|format(price) }}</span></h1>
     {% if deck.archived %}
         <div class="alert alert-warning mt-4" role="alert">This deck is currently archived.</div>
     {% endif %}
@@ -93,7 +93,22 @@
                                                     {% endif %}
                                                 </div>
                                             </td>
-                                            <td class="js-price">Loading...</td>
+                                            {% if assoc.card.foil == "regular" and assoc.card.details.price_regular %}
+                                                {% set price = assoc.card.details.price_regular %}
+                                            {% elif assoc.card.foil == "foil" and assoc.card.details.price_foil %}
+                                                {% set price = assoc.card.details.price_foil %}
+                                            {% elif assoc.card.foil == "foil" and assoc.card.details.price_etched %}
+                                                {% set price = assoc.card.details.price_etched %}
+                                            {% elif assoc.card.details.price_regular %}
+                                                {% set price = assoc.card.details.price_regular %}
+                                            {% elif assoc.card.details.price_foil %}
+                                                {% set price = assoc.card.details.price_foil %}
+                                            {% elif assoc.card.details.price_etched %}
+                                                {% set price = assoc.card.details.price_etched %}
+                                            {% else %}
+                                                {% set price = 0 %}
+                                            {% endif %}
+                                            <td>${{ '%0.2f'|format(price) }}</td>
                                             <td class="text-center">
                                                 <div class="dropdown">
                                                     <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -186,7 +201,22 @@
                                                     {% endif %}
                                                 </div>
                                             </td>
-                                            <td class="js-price">Loading...</td>
+                                            {% if assoc.card.foil == "regular" and assoc.card.details.price_regular %}
+                                                {% set price = assoc.card.details.price_regular %}
+                                            {% elif assoc.card.foil == "foil" and assoc.card.details.price_foil %}
+                                                {% set price = assoc.card.details.price_foil %}
+                                            {% elif assoc.card.foil == "foil" and assoc.card.details.price_etched %}
+                                                {% set price = assoc.card.details.price_etched %}
+                                            {% elif assoc.card.details.price_regular %}
+                                                {% set price = assoc.card.details.price_regular %}
+                                            {% elif assoc.card.details.price_foil %}
+                                                {% set price = assoc.card.details.price_foil %}
+                                            {% elif assoc.card.details.price_etched %}
+                                                {% set price = assoc.card.details.price_etched %}
+                                            {% else %}
+                                                {% set price = 0 %}
+                                            {% endif %}
+                                            <td>${{ '%0.2f'|format(price) }}</td>
                                             <td class="text-center">
                                                 <div class="dropdown">
                                                     <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">

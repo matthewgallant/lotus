@@ -64,7 +64,22 @@
                                 <td class="text-capitalize">{{ card.details.rarity|default('N/A', 'true') }}</td>
                                 <td class="text-capitalize js-foil">{{ card.foil|default('regular', 'true') }}</td>
                                 <td>{{ card.details.collector_number|default('N/A', 'true') }}</td>
-                                <td class="js-price">Loading...</td>
+                                {% if card.foil == "regular" and card.details.price_regular %}
+                                    {% set price = card.details.price_regular %}
+                                {% elif card.foil == "foil" and card.details.price_foil %}
+                                    {% set price = card.details.price_foil %}
+                                {% elif card.foil == "foil" and card.details.price_etched %}
+                                    {% set price = card.details.price_etched %}
+                                {% elif card.details.price_regular %}
+                                    {% set price = card.details.price_regular %}
+                                {% elif card.details.price_foil %}
+                                    {% set price = card.details.price_foil %}
+                                {% elif card.details.price_etched %}
+                                    {% set price = card.details.price_etched %}
+                                {% else %}
+                                    {% set price = 0 %}
+                                {% endif %}
+                                <td>${{ '%0.2f'|format(price) }}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">

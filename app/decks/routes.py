@@ -56,6 +56,7 @@ def deck(id):
         warning = None
         card_names = []
         duplicates = []
+        price = 0
 
         binders = {
             "legendary": {
@@ -125,6 +126,20 @@ def deck(id):
             
             if len(duplicates) > 0:
                 warning = f"There are duplicates of the following: {', '.join(duplicates)}."
+            
+            # Gather price data
+            if card.foil == "regular" and card.details.price_regular:
+                price += card.details.price_regular
+            elif card.foil == "foil" and card.details.price_foil:
+                price += card.details.price_foil
+            elif card.foil == "foil" and card.details.price_etched:
+                price += card.details.price_etched
+            elif card.details.price_regular:
+                price += card.details.price_regular
+            elif card.details.price_foil:
+                price += card.details.price_foil
+            elif card.details.price_etched:
+                price += card.details.price_etched
 
             # Sort cards for gathering
             if ("legendary" in card.details.type_line.lower() and "creature" in card.details.type_line.lower()) or (card.details.text is not None and "be your commander" in card.details.text): # Commanders
@@ -146,7 +161,7 @@ def deck(id):
             elif card.details.color_identity: # Multi
                 binders["multi"][card.details.rarity].append(card)
             
-        return render_template("decks/deck.html", deck=deck, binders=binders, warning=warning)
+        return render_template("decks/deck.html", deck=deck, binders=binders, warning=warning, price=price)
     else:
         if request.form.get('plains'):
             deck.plains = int(request.form.get('plains'))

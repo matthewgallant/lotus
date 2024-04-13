@@ -92,6 +92,6 @@
         {% endif %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}">
     {% else %}
-        <p>No decks found. <a href="/decks/add">Add Your First One</a></p>
+        <p>No decks found. <a href="{{ url_for('decks.add_deck') }}">Add Your First One</a></p>
     {% endif %}
 {% endblock %}

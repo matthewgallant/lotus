@@ -22,17 +22,8 @@ class DeckPage {
         this.utilities.enableDynamicCardImages(this.mainboardRows, this.mainboardCardImageEl);
         this.utilities.enableDynamicCardImages(this.sideboardRows, this.sideboardCardImageEl);
         this.utilities.enableDynamicCardImages(this.gatherRows, this.gatherCardImageEl);
-        this.getPricingData();
         this.setupMainboardRowActionEventListeners();
         this.setupSideboardRowActionEventListeners();
-    }
-
-    async getPricingData() {
-        this.totalPrice = await this.utilities.livePriceLoading(this.mainboardRows);
-        this.priceBadgeEl.innerText = `$${(Math.round((this.totalPrice + Number.EPSILON) * 100) / 100).toFixed(2)}`;
-
-        // Load sideboard prices after mainboard
-        await this.utilities.livePriceLoading(this.sideboardRows);
     }
 
     setupMainboardRowActionEventListeners() {
