@@ -6,7 +6,7 @@ class MessageLog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     date = db.Column(db.DateTime, nullable=False)
-    message = db.Column(db.String(250), nullable=False)
+    message = db.Column(db.String(500), nullable=False)
 
     def __init__(self, message):
         self.date = datetime.now()
