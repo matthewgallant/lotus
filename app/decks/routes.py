@@ -33,10 +33,11 @@ def decks():
         # No commander, get color identity from cards (slower)
         else:
             for card in deck.mainboard:
-                colors = card.card.details.color_identity.split(',')
-                for color in colors:
-                    if color not in color_identity:
-                        color_identity.append(color)
+                if card.card.details.color_identity:
+                    colors = card.card.details.color_identity.split(',')
+                    for color in colors:
+                        if color not in color_identity:
+                            color_identity.append(color)
 
         # Set the color identity
         deck.color_identity = color_identity
