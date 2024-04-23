@@ -76,7 +76,7 @@ def add_card():
 @bp.route("/add/<scryfall_id>")
 @login_required
 def add_card_from_scryfall(scryfall_id):
-    message = None
+    success = None
     error = None
 
     # Handle foils
@@ -91,7 +91,7 @@ def add_card_from_scryfall(scryfall_id):
 
     if existing_card:
         existing_card.quantity += 1
-        message = f"{existing_card.name}'s quantity has been increased."
+        success = f"{existing_card.details.name}'s quantity has been increased."
 
         # Add message log entry
         message = MessageLog(f"Quantity for '{existing_card}' has been increased.")
@@ -179,26 +179,26 @@ def add_card_from_scryfall(scryfall_id):
             else:
                 error = "An error has occured when trying to add the card."
     
-    # Create card if card details exist
-    if details_id:
-        new_card = Card(
-            current_user.id,
-            details_id,
-            1, # Quantity
-            foil
-        )
-        db.session.add(new_card)
-        db.session.flush()
+        # Create card if card details exist
+        if details_id:
+            new_card = Card(
+                current_user.id,
+                details_id,
+                1, # Quantity
+                foil
+            )
+            db.session.add(new_card)
+            db.session.flush()
 
-        # Add message log entry
-        message = MessageLog(f"New card '{new_card}' has been added.")
-        db.session.add(message)
+            # Add message log entry
+            message = MessageLog(f"New card '{new_card}' has been added.")
+            db.session.add(message)
 
-        message = f"{new_card.details.name} has been added to your collection."
+            success = f"{new_card.details.name} has been added to your collection."
 
     db.session.commit()
     
-    return redirect(url_for('cards.add_card', message=message, error=error))
+    return redirect(url_for('cards.add_card', success=success, error=error))
 
 @bp.route("/import", methods=['GET', 'POST'])
 @login_required

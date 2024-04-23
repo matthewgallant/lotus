@@ -6,8 +6,8 @@
     <h1>Add Card</h1>
     {% if request.args.error %}
         <div class="alert alert-danger" role="alert">{{ request.args.error }}</div>
-    {% elif request.args.message %}
-        <div class="alert alert-success" role="alert">{{ request.args.message }}</div>
+    {% elif request.args.success %}
+        <div class="alert alert-success" role="alert">{{ request.args.success }}</div>
     {% endif %}
     <form id="nameSearchForm">
         <div class="mt-3 d-flex align-items-center gap-3">
