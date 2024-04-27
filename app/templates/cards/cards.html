@@ -17,6 +17,7 @@
                     <table class="table table-striped table-bordered table-hover mt-3">
                         <thead class="sticky-top">
                             <tr>
+                                <th scope="col">Name</th>
                                 <th scope="col">Set ID</th>
                                 <th scope="col">Owned</th>
                                 <th scope="col">Available</th>
@@ -32,6 +33,7 @@
                         <tbody class="align-middle">
                             {% for card in cards.items %}
                                 <tr class="{{ 'table-danger' if card.decks|length >= card.quantity else 'table-success' }}" data-scryfall-id="{{ card.details.scryfall_id }}">
+                                    <td>{{ card.details.name }}</td>
                                     <td>{{ card.details.set_id }}</td>
                                     <td>
                                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#quantityModal{{ card.id }}">{{ card.quantity }}</button>
