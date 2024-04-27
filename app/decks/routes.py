@@ -6,14 +6,13 @@ from app.extensions import db
 
 from app.models.deck_card import DeckCard
 from app.models.deck import Deck
-from app.models.card_details import CardDetails
 from app.models.message_log import MessageLog
 
 @bp.route("/")
 @login_required
 def decks():
     # Get decks owned by user
-    query = db.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.id.desc())
+    query = db.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.archived, Deck.id.desc())
     decks = db.paginate(query, per_page=10)
     
     # Get color identity
