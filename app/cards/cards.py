@@ -3,20 +3,20 @@ import json
 import time
 import requests
 
-from flask import render_template, redirect, request, url_for, abort
+from flask import Blueprint, render_template, redirect, request, url_for, abort
 from flask_login import login_required, current_user
 from sqlalchemy import and_
 
-from app.cards import bp
 from app.extensions import db
-
 from app.models.deck import Deck
 from app.models.card import Card
 from app.models.deck_card import DeckCard
 from app.models.card_details import CardDetails
 from app.models.message_log import MessageLog
 
-@bp.route("/")
+cards_bp = Blueprint('cards', __name__)
+
+@cards_bp.route("/")
 def cards():
     # Get cards owned by user
     query = db.select(Card).join(Card.details).order_by(
@@ -37,7 +37,7 @@ def cards():
     
     return render_template("cards/cards.html", cards=cards, decks=decks)
 
-@bp.route("/<id>")
+@cards_bp.route("/<id>")
 @login_required
 def card(id):
     card = db.get_or_404(Card, id)
@@ -56,7 +56,7 @@ def card(id):
 
     return render_template("cards/card.html", card=card, cards=cards, decks=decks)
     
-@bp.route('/<card_id>/decks')
+@cards_bp.route('/<card_id>/decks')
 @login_required
 def card_decks(card_id):
     card = db.get_or_404(Card, card_id)
@@ -67,12 +67,12 @@ def card_decks(card_id):
 
     return render_template("cards/card-decks.html", card=card)
 
-@bp.route("/add")
+@cards_bp.route("/add")
 @login_required
 def add_card():
     return render_template("cards/add-card.html")
     
-@bp.route("/add/<scryfall_id>")
+@cards_bp.route("/add/<scryfall_id>")
 @login_required
 def add_card_from_scryfall(scryfall_id):
     success = None
@@ -199,7 +199,7 @@ def add_card_from_scryfall(scryfall_id):
     
     return redirect(url_for('cards.add_card', success=success, error=error))
 
-@bp.route("/import", methods=['GET', 'POST'])
+@cards_bp.route("/import", methods=['GET', 'POST'])
 @login_required
 def import_cards():
     if request.method == 'GET':

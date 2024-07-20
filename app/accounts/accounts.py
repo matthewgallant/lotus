@@ -1,14 +1,14 @@
-from flask import render_template, redirect, request, url_for, abort
+from flask import Blueprint, render_template, redirect, request, url_for, abort
 from flask_login import login_required, login_user, logout_user
 from urllib.parse import urlparse
 
-from app.accounts import bp
 from app.extensions import db, bcrypt
-
 from app.models.user import User
 from app.models.message_log import MessageLog
 
-@bp.route('/login', methods=['GET', 'POST'])
+account_bp = Blueprint('account', __name__)
+
+@account_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "POST":
         error = None
@@ -51,7 +51,7 @@ def login():
     else:
         return render_template("accounts/login.html")
 
-@bp.route('/register', methods=['GET', 'POST'])
+@account_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == "POST":
         error = None
@@ -114,7 +114,7 @@ def register():
     else:
         return render_template("accounts/register.html")
     
-@bp.route("/logout")
+@account_bp.route("/logout")
 @login_required
 def logout():
     logout_user()

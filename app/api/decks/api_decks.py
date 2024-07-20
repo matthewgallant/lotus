@@ -1,15 +1,15 @@
-from flask import request, abort
+from flask import Blueprint, request, abort
 from flask_login import login_required, current_user
 
-from app.api.decks import bp
 from app.extensions import db
-
 from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 from app.models.card import Card
 from app.models.message_log import MessageLog
 
-@bp.route('/<deck_id>/add', methods=['POST'])
+api_decks_bp = Blueprint('api_decks', __name__)
+
+@api_decks_bp.route('/<deck_id>/add', methods=['POST'])
 @login_required
 def add_card_to_deck(deck_id):
     if request.form.get("card_id") and request.form.get("board"):
@@ -40,7 +40,7 @@ def add_card_to_deck(deck_id):
     else:
         return { "error": "An error occured while trying to add the card to the deck." }
 
-@bp.route('/card/move', methods=['POST'])
+@api_decks_bp.route('/card/move', methods=['POST'])
 @login_required
 def move_card_board():
     if request.form.get("assoc_id") and request.form.get("board"):
@@ -68,7 +68,7 @@ def move_card_board():
     else:
         return { "error": "An error occured while moving the card's board." }
     
-@bp.route('/card/commander', methods=['POST'])
+@api_decks_bp.route('/card/commander', methods=['POST'])
 @login_required
 def set_commander_for_deck():
     if request.form.get("assoc_id") and request.form.get("set_commander"):
@@ -99,7 +99,7 @@ def set_commander_for_deck():
     else:
         return { "error": "An error occured while trying to change the commander status." }
 
-@bp.route('/card/remove', methods=['POST'])
+@api_decks_bp.route('/card/remove', methods=['POST'])
 @login_required
 def remove_card_from_deck():
     if request.form.get("assoc_id"):

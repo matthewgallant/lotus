@@ -1,19 +1,18 @@
 from flask import Flask, render_template
 
-from config import Config
+from app.config import Config
 from app.extensions import db, bcrypt, login_manager, scheduler
-
-from app.main import bp as main_bp
-from app.accounts import bp as account_bp
-from app.search import bp as search_bp
-from app.decks import bp as decks_bp
-from app.cards import bp as cards_bp
-from app.api.cards import bp as api_cards_bp
-from app.api.decks import bp as api_decks_bp
+from app.main.main import main_bp
+from app.accounts.accounts import account_bp
+from app.search.search import search_bp
+from app.decks.decks import decks_bp
+from app.cards.cards import cards_bp
+from app.api.cards.api_cards import api_cards_bp
+from app.api.decks.api_decks import api_decks_bp
 
 from app.models.user import User
 
-from app.jobs import update_prices
+from app.jobs.update_prices import update_prices
 
 def create_app(config_class=Config):
     app = Flask(__name__)

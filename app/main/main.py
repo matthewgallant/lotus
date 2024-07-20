@@ -1,14 +1,14 @@
-from flask import render_template
+from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
-from app.main import bp
 from app.extensions import db
-
 from app.models.card import Card
 from app.models.card_details import CardDetails
 
-@bp.route('/')
+main_bp = Blueprint('main', __name__)
+
+@main_bp.route('/')
 @login_required
 def index():
     # Get total cards in collection

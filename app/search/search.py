@@ -1,14 +1,14 @@
-from flask import render_template, redirect, request, url_for
+from flask import Blueprint, render_template, redirect, request, url_for
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
-from app.search import bp
 from app.extensions import db
-
 from app.models.card import Card
 from app.models.card_details import CardDetails
 
-@bp.route("/", methods=['GET', 'POST'])
+search_bp = Blueprint('search', __name__)
+
+@search_bp.route("/", methods=['GET', 'POST'])
 @login_required
 def search():
     if request.method == 'POST':
@@ -40,7 +40,7 @@ def search():
 
         return render_template("search/search.html", sets=sets)
 
-@bp.route("/results")
+@search_bp.route("/results")
 @login_required
 def results():
     subquery = db.select(func.min(Card.id)).join(Card.details).where(Card.user_id == current_user.id).group_by(CardDetails.name)

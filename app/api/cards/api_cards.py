@@ -1,16 +1,16 @@
-from flask import request, abort
+from flask import Blueprint, request, abort
 from flask_login import login_required, current_user
 from markupsafe import escape
 
-from app.api.cards import bp
 from app.extensions import db
-
 from app.models.deck_card import DeckCard
 from app.models.card import Card
 from app.models.card_details import CardDetails
 from app.models.message_log import MessageLog
 
-@bp.route('/autocomplete', methods=['POST'])
+api_cards_bp = Blueprint('api_cards', __name__)
+
+@api_cards_bp.route('/autocomplete', methods=['POST'])
 @login_required
 def autocomplete():
     if request.form.get("query"):
@@ -21,7 +21,7 @@ def autocomplete():
         
         return cards
 
-@bp.route('/<card_id>/quantity', methods=['POST'])
+@api_cards_bp.route('/<card_id>/quantity', methods=['POST'])
 @login_required
 def edit_card_quantity(card_id):
     if request.form.get('quantity'):
@@ -43,7 +43,7 @@ def edit_card_quantity(card_id):
     else:
         return { "error": "A quantity if required to update." }
 
-@bp.route('/delete', methods=['POST'])
+@api_cards_bp.route('/delete', methods=['POST'])
 @login_required
 def delete_card():
     if request.form.get("card_id"):

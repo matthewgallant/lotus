@@ -1,14 +1,14 @@
-from flask import render_template, redirect, request, url_for, abort
+from flask import Blueprint, render_template, redirect, request, url_for, abort
 from flask_login import login_required, current_user
 
-from app.decks import bp
 from app.extensions import db
-
 from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 from app.models.message_log import MessageLog
 
-@bp.route("/")
+decks_bp = Blueprint('decks', __name__)
+
+@decks_bp.route("/")
 @login_required
 def decks():
     # Get decks owned by user
@@ -43,7 +43,7 @@ def decks():
     
     return render_template("decks/decks.html", decks=decks)
         
-@bp.route('/<id>', methods=['GET', 'POST'])
+@decks_bp.route('/<id>', methods=['GET', 'POST'])
 @login_required
 def deck(id):
     deck = db.get_or_404(Deck, id)
@@ -181,7 +181,7 @@ def deck(id):
 
         return redirect(url_for('decks.deck', id=deck.id, message='Basic lands have been updated for this deck.'))
 
-@bp.route("/add", methods=['GET', 'POST'])
+@decks_bp.route("/add", methods=['GET', 'POST'])
 @login_required
 def add_deck():
     if request.method == 'GET':
@@ -201,7 +201,7 @@ def add_deck():
         else:
             return render_template("decks/add-deck.html", error='A deck name is required!.')
 
-@bp.route('/<id>/notes', methods=['POST'])
+@decks_bp.route('/<id>/notes', methods=['POST'])
 @login_required
 def deck_notes(id):
     deck = db.get_or_404(Deck, id)
@@ -220,7 +220,7 @@ def deck_notes(id):
     
     return redirect(url_for('decks.deck', id=deck.id, message='Deck notes have been updated.'))
 
-@bp.route('/<id>/rename', methods=['POST'])
+@decks_bp.route('/<id>/rename', methods=['POST'])
 @login_required
 def rename_deck(id):
     deck = db.get_or_404(Deck, id)
@@ -241,7 +241,7 @@ def rename_deck(id):
     
     return redirect(url_for('decks.deck', id=deck.id, message='Deck name has been updated.'))
 
-@bp.route('/<deck_id>/archive')
+@decks_bp.route('/<deck_id>/archive')
 @login_required
 def archive_deck(deck_id):
     deck = db.get_or_404(Deck, deck_id)
@@ -266,7 +266,7 @@ def archive_deck(deck_id):
     
     return redirect(url_for('decks.deck', id=deck_id, message=f"{deck.name} has been archived."))
 
-@bp.route('/<deck_id>/unarchive')
+@decks_bp.route('/<deck_id>/unarchive')
 @login_required
 def unarchive_deck(deck_id):
     deck = db.get_or_404(Deck, deck_id)
@@ -291,7 +291,7 @@ def unarchive_deck(deck_id):
     
     return redirect(url_for('decks.deck', id=deck_id, message=f"{deck.name} has been unarchived."))
 
-@bp.route('/<deck_id>/delete')
+@decks_bp.route('/<deck_id>/delete')
 @login_required
 def delete_deck(deck_id):
     deck = db.get_or_404(Deck, deck_id)
