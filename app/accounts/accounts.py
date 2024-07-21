@@ -6,7 +6,7 @@ from app.extensions import db, bcrypt
 from app.models.user import User
 from app.models.message_log import MessageLog
 
-account_bp = Blueprint('account', __name__)
+account_bp = Blueprint('account', __name__, template_folder="templates")
 
 @account_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -38,18 +38,11 @@ def login():
             error = "An email address and password are required."
 
         if error:
-            return render_template("accounts/login.html", error=error)
+            return render_template("login.html", error=error)
         else:
-            # Prevent open redirects
-            next = request.args.get('next', '')
-            next = next.replace('\\', '')
-            if not urlparse(next).netloc:
-                # relative path, safe to redirect
-                return redirect(next, code=302)
-            # ignore the target and redirect to the home page
-            return redirect(url_for("main.index", message="Your account has been logged in successfully."))
+            return redirect(url_for("home.home", message="Your account has been logged in successfully."))
     else:
-        return render_template("accounts/login.html")
+        return render_template("login.html")
 
 @account_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -108,11 +101,11 @@ def register():
             error = "A name, email, and password are required."
         
         if error:
-            return render_template("accounts/register.html", error=error)
+            return render_template("register.html", error=error)
         else:
-            return redirect(url_for("main.index", message="Your account has been registered successfully."))
+            return redirect(url_for("home.home", message="Your account has been registered successfully."))
     else:
-        return render_template("accounts/register.html")
+        return render_template("register.html")
     
 @account_bp.route("/logout")
 @login_required

@@ -2,7 +2,7 @@ from flask import Flask, render_template
 
 from app.config import Config
 from app.extensions import db, bcrypt, login_manager, scheduler
-from app.main.main import main_bp
+from app.home.home import home_bp
 from app.accounts.accounts import account_bp
 from app.search.search import search_bp
 from app.decks.decks import decks_bp
@@ -36,7 +36,7 @@ def create_app(config_class=Config):
         return db.session.execute(db.select(User).where(User.id == int(user_id))).scalar_one_or_none()
 
     # Register blueprints
-    app.register_blueprint(main_bp)
+    app.register_blueprint(home_bp)
     app.register_blueprint(account_bp, url_prefix='/account')
     app.register_blueprint(search_bp, url_prefix='/search')
     app.register_blueprint(decks_bp, url_prefix='/decks')

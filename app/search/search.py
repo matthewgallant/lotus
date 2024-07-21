@@ -6,7 +6,7 @@ from app.extensions import db
 from app.models.card import Card
 from app.models.card_details import CardDetails
 
-search_bp = Blueprint('search', __name__)
+search_bp = Blueprint('search', __name__, template_folder="templates")
 
 @search_bp.route("/", methods=['GET', 'POST'])
 @login_required
@@ -38,7 +38,7 @@ def search():
         query = db.select(CardDetails.set_id).join(Card.details).where(Card.user_id == current_user.id).group_by(CardDetails.set_id)
         sets = db.session.execute(query)
 
-        return render_template("search/search.html", sets=sets)
+        return render_template("search.html", sets=sets)
 
 @search_bp.route("/results")
 @login_required
@@ -92,7 +92,7 @@ def results():
     else:
         if request.args.get("page"):
             # Page is only used in API calls
-            return render_template("search/api/cards.html", cards=cards)
+            return render_template("api/cards.html", cards=cards)
         else:
-            return render_template("search/results.html", cards=cards)
+            return render_template("results.html", cards=cards)
         

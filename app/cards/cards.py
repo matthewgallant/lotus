@@ -14,7 +14,7 @@ from app.models.deck_card import DeckCard
 from app.models.card_details import CardDetails
 from app.models.message_log import MessageLog
 
-cards_bp = Blueprint('cards', __name__)
+cards_bp = Blueprint('cards', __name__, template_folder="templates")
 
 @cards_bp.route("/")
 def cards():
@@ -35,7 +35,7 @@ def cards():
     query = db.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.id.desc())
     decks = db.session.execute(query).scalars().all()
     
-    return render_template("cards/cards.html", cards=cards, decks=decks)
+    return render_template("cards.html", cards=cards, decks=decks)
 
 @cards_bp.route("/<id>")
 @login_required
@@ -54,7 +54,7 @@ def card(id):
     query = db.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.id.desc())
     decks = db.session.execute(query).scalars().all()
 
-    return render_template("cards/card.html", card=card, cards=cards, decks=decks)
+    return render_template("card.html", card=card, cards=cards, decks=decks)
     
 @cards_bp.route('/<card_id>/decks')
 @login_required
@@ -65,12 +65,12 @@ def card_decks(card_id):
     if card.user_id != current_user.id:
         abort(401)
 
-    return render_template("cards/card-decks.html", card=card)
+    return render_template("card-decks.html", card=card)
 
 @cards_bp.route("/add")
 @login_required
 def add_card():
-    return render_template("cards/add-card.html")
+    return render_template("add-card.html")
     
 @cards_bp.route("/add/<scryfall_id>")
 @login_required
@@ -104,7 +104,7 @@ def add_card_from_scryfall(scryfall_id):
         if existing_details:
             details_id = existing_details.id
         else:
-            res = requests.get(f'https://api.scryfall.com/cards/{scryfall_id}')
+            res = requests.get(f'https://api.scryfall.com/{scryfall_id}')
             if res.status_code == 200:
                 data = json.loads(res.text)
 
@@ -203,7 +203,7 @@ def add_card_from_scryfall(scryfall_id):
 @login_required
 def import_cards():
     if request.method == 'GET':
-        return render_template("cards/import.html")
+        return render_template("import.html")
     else:
         success = None
         error = None
@@ -251,7 +251,7 @@ def import_cards():
             for chunk in chunked_payload:
                 
                 # Post chunk to Scryfall
-                res = requests.post("https://api.scryfall.com/cards/collection", json={ "identifiers": chunk })
+                res = requests.post("https://api.scryfall.com/collection", json={ "identifiers": chunk })
                 if res.status_code == 200:
 
                     # Attempt to read data

@@ -160,6 +160,6 @@
     {% else %}
         <p>No cards found. <a href="{{ url_for('cards.add_card') }}">Add Your First One</a></p>
     {% endif %}
-    {% include "components/toast.html" %}
+    {% include "toast.html" %}
     <script src="{{ url_for('static', filename='js/card.js') }}"></script>
 {% endblock %}

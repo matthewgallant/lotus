@@ -6,7 +6,7 @@ from app.models.deck_card import DeckCard
 from app.models.deck import Deck
 from app.models.message_log import MessageLog
 
-decks_bp = Blueprint('decks', __name__)
+decks_bp = Blueprint('decks', __name__, template_folder="templates")
 
 @decks_bp.route("/")
 @login_required
@@ -41,7 +41,7 @@ def decks():
         # Set the color identity
         deck.color_identity = color_identity
     
-    return render_template("decks/decks.html", decks=decks)
+    return render_template("decks.html", decks=decks)
         
 @decks_bp.route('/<id>', methods=['GET', 'POST'])
 @login_required
@@ -161,7 +161,7 @@ def deck(id):
             elif card.details.color_identity: # Multi
                 binders["multi"][card.details.rarity].append(card)
             
-        return render_template("decks/deck.html", deck=deck, binders=binders, warning=warning, price=price)
+        return render_template("deck.html", deck=deck, binders=binders, warning=warning, price=price)
     else:
         if request.form.get('plains'):
             deck.plains = int(request.form.get('plains'))
@@ -185,7 +185,7 @@ def deck(id):
 @login_required
 def add_deck():
     if request.method == 'GET':
-        return render_template("decks/add-deck.html")
+        return render_template("add-deck.html")
     else:
         if request.form.get('name'):
             deck = Deck(current_user.id, request.form.get('name'))
@@ -199,7 +199,7 @@ def add_deck():
             
             return redirect(url_for('decks.deck', id=deck.id))
         else:
-            return render_template("decks/add-deck.html", error='A deck name is required!.')
+            return render_template("add-deck.html", error='A deck name is required!.')
 
 @decks_bp.route('/<id>/notes', methods=['POST'])
 @login_required
