@@ -19,7 +19,7 @@ cards_bp = Blueprint('cards', __name__, template_folder="templates")
 @cards_bp.route("/")
 def cards():
     # Get cards owned by user
-    query = db.select(Card).join(Card.details).order_by(
+    query = db.select(Card).join(Card.details).where(Card.user_id == current_user.id).order_by(
         db.case(
             (and_(Card.foil == "regular", CardDetails.price_regular), CardDetails.price_regular),
             (and_(Card.foil == "foil", CardDetails.price_foil), CardDetails.price_foil),
